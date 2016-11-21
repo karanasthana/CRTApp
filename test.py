@@ -23,8 +23,11 @@ def get_calendar(locale, fwday):
     else:
         return calendar.LocaleTextCalendar(fwday, locale)
 
+returnToMenu = False
 
-
+MINSIZEROW2 = 160
+MINSIZEROW3 = 0
+MINSIZECOLUMN = 266
 
 
 class CRTApp(tk.Tk):
@@ -54,7 +57,7 @@ class CRTApp(tk.Tk):
 
         self.frames = {}
 
-        for F in (TNSConfig, DateTimeSetting, MainScreen, Menu, Settings, Export, Login ):
+        for F in (TNSConfig, DateTimeSetting, MainScreen, Menu, Settings, Output, ViewOutput ):
 
             frame = F(container, self)
             self.frames[F] = frame
@@ -98,12 +101,12 @@ class TNSConfig(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.grid_columnconfigure(0,weight=1,minsize = 250)
-        self.grid_columnconfigure(1,weight=1,minsize = 250)
-        self.grid_columnconfigure(2,weight=1,minsize = 250)
+        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
         # self.grid_rowconfigure(0,weight=1,minsize = 80)
-        self.grid_rowconfigure(2,weight=3,minsize = 160)
-        self.grid_rowconfigure(3,weight=1,minsize = 50)
+        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
         
         title = tk.Label(self, text="TNS Configuration", font=controller.headerFont)
         title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
@@ -137,22 +140,31 @@ class TNSConfig(tk.Frame):
         entry3.grid(row = 2, column =1,padx = 80)
         entry4.grid(row = 3, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Next", command = lambda : controller.show_frame(DateTimeSetting))
+        nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller))
 
         nextButton.grid()
         # print self.grid_size()
         # pcalender.__init__("Anupam")
+    def local_show_frame(self,controller):
+
+        global returnToMenu
+        # print returnToMenu
+        if returnToMenu == True:
+            controller.show_frame(Menu)
+        else:
+            controller.show_frame(DateTimeSetting)
+
 
 
 class DateTimeSetting(tk.Frame):
 
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
-        self.grid_columnconfigure(0,weight=1,minsize = 250)
-        self.grid_columnconfigure(1,weight=1,minsize = 250)
-        self.grid_columnconfigure(2,weight=1,minsize = 250)
-        self.grid_rowconfigure(2,weight=3,minsize = 160)
-        self.grid_rowconfigure(3,weight=1,minsize = 50)
+        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
 
         title = tk.Label(self, text="Date and Time Settings", font = controller.headerFont)
         title.grid(pady=10,padx=10,columnspan = 3, sticky="w")
@@ -226,11 +238,11 @@ class MainScreen(tk.Frame):
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.grid_columnconfigure(0,weight=1,minsize = 266)
-        self.grid_columnconfigure(1,weight=1,minsize = 266)
-        self.grid_columnconfigure(2,weight=1,minsize = 266)
-        self.grid_rowconfigure(2,weight=3,minsize = 160)
-        self.grid_rowconfigure(3,weight=1,minsize = 50)
+        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
 
         title = tk.Label(self, text="Statistics", font=controller.headerFont)
         title.grid(pady=10,padx=10,columnspan = 3, sticky="w")
@@ -297,9 +309,11 @@ class Menu(tk.Frame):
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.grid_columnconfigure(0,weight=1,minsize = 266)
-        self.grid_columnconfigure(1,weight=1,minsize = 266)
-        self.grid_columnconfigure(2,weight=1,minsize = 266)
+        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
 
         title = tk.Label(self, text="Menu", font=controller.headerFont)
         title.grid(pady=10,padx=10,columnspan = 3, sticky="w")
@@ -310,10 +324,13 @@ class Menu(tk.Frame):
         display = tk.Frame(self)#,borderwidth=3,relief = tk.GROOVE)
         display.grid(row=2, column=0,pady = 70,padx=250)
 
-        button1 = tk.Button(display, text = "TNS Configuration", command = lambda : controller.show_frame(TNSConfig),width=30)
-        button2 = tk.Button(display, text = "Settings", command = qf,width=30)
-        button3 = tk.Button(display, text = "View Output", command = qf,width=30)
-        button4 = tk.Button(display, text = "Export", command = qf,width=30)
+        # returnToMenu = True
+        # print returnToMenu
+
+        button1 = tk.Button(display, text = "TNS Configuration", command = lambda : self.local_show_frame(controller),width=30)
+        button2 = tk.Button(display, text = "Export", command = qf,width=30)
+        button3 = tk.Button(display, text = "View Output", command = lambda : controller.show_frame(Output),width=30)
+        button4 = tk.Button(display, text = "Settings", command = lambda : controller.show_frame(Settings),width=30)
 
         button1.pack(pady=10)
         button2.pack(side = "bottom",pady=10)
@@ -327,15 +344,23 @@ class Menu(tk.Frame):
 
         backButton.grid()
 
+    def local_show_frame(self, controller):
+
+        global returnToMenu
+        returnToMenu = True
+        controller.show_frame(TNSConfig)
+
 
 class Settings(tk.Frame):
 
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.grid_columnconfigure(0,weight=1,minsize = 266)
-        self.grid_columnconfigure(1,weight=1,minsize = 266)
-        self.grid_columnconfigure(2,weight=1,minsize = 266)
+        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
 
         title = tk.Label(self, text="Settings", font=controller.headerFont)
         title.grid(pady=10,padx=10,columnspan = 3, sticky="w")
@@ -343,37 +368,136 @@ class Settings(tk.Frame):
         separator = ttk.Separator(self,orient=tk.HORIZONTAL)
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
+        entry = tk.Frame(self)
+        entry.grid(row=2, column=0, pady=75,padx=180)
 
-class Export(tk.Frame):
+        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
+        buttons.grid(row=3, column=0,padx=0, columnspan=3)
+
+        label1 = tk.Label(entry, text = "Max Temperature :",font = controller.defaultFont)
+        label2 = tk.Label(entry, text = "Min Temperature :",font=controller.defaultFont)      
+        
+        entry1 = tk.Entry(entry)
+        entry2 = tk.Entry(entry)
+
+        label1.grid(row = 0, column =0,pady=10,sticky="e")
+        label2.grid(row = 1, column =0,pady=10,sticky="e")
+
+        entry1.grid(row = 0, column =1,padx = 80)
+        entry2.grid(row = 1, column =1,padx = 80)
+
+        nextButton = ttk.Button(buttons, text = "Save", command = lambda : controller.show_frame(Menu))
+
+        nextButton.grid()
+
+
+
+
+class Output(tk.Frame):
 
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
         
-        self.grid_columnconfigure(0,weight=1,minsize = 266)
-        self.grid_columnconfigure(1,weight=1,minsize = 266)
-        self.grid_columnconfigure(2,weight=1,minsize = 266)
+        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
 
-        title = tk.Label(self, text="Export", font=controller.headerFont)
+        title = tk.Label(self, text="Output", font=controller.headerFont)
         title.grid(pady=10,padx=10,columnspan = 3, sticky="w")
 
         separator = ttk.Separator(self,orient=tk.HORIZONTAL)
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
+        entry = tk.Frame(self)
+        entry.grid(row=2, column=0, pady=75,padx=180)
 
-class Login(tk.Frame):
+        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
+        buttons.grid(row=3, column=0,pady = 0,padx=0, columnspan=3)
+
+        label1 = tk.Label(entry, text = "START DATE :",font = controller.defaultFont)
+        label2 = tk.Label(entry, text = "START TIME :",font=controller.defaultFont)
+        label3 = tk.Label(entry, text = "END DATE :",font=controller.defaultFont)
+        label4 = tk.Label(entry, text = "END TIME :",font=controller.defaultFont)
+        label5 = tk.Label(entry, text = "TIME INTERVAL :",font=controller.defaultFont)
+
+        entry1 = tk.Entry(entry)
+
+        time1 = tk.Frame(entry)
+
+        hh1 = tk.StringVar(time1)
+        hh1.set(HHLIST[0])
+        HH1 = ttk.Combobox(time1, textvariable = hh1, values=HHLIST,width=7)
+        HH1.grid(row=0,column=0,padx=3)
+        
+        mm1 = tk.StringVar(time1)
+        mm1.set(MMLIST[0])
+        MM1 = ttk.Combobox(time1, textvariable = mm1, values=MMLIST,width=7)
+        MM1.grid(row=0,column = 1,padx=3)
+                
+        entry3 = tk.Entry(entry)
+
+        time2 = tk.Frame(entry)
+        
+        hh2 = tk.StringVar(time2)
+        hh2.set(HHLIST[0])
+        HH2 = ttk.Combobox(time2, textvariable = hh2, values=HHLIST,width=7)
+        HH2.grid(row=0,column=0,padx=3)
+        
+        mm2 = tk.StringVar(time2)
+        mm2.set(MMLIST[0])
+        MM2 = ttk.Combobox(time2, textvariable = mm2, values=MMLIST,width=7)
+        MM2.grid(row=0,column = 1,padx=3)
+
+        entry5 = tk.Entry(entry)
+        
+        label1.grid(row = 0, column =0,pady=10,sticky="e")
+        label2.grid(row = 1, column =0,pady=10,sticky="e")
+        label3.grid(row = 2, column =0,pady=10,sticky="e")
+        label4.grid(row = 3, column =0,pady=10,sticky="e")
+        label5.grid(row = 4, column =0,pady=10,sticky="e")
+
+        entry1.grid(row = 0, column =1,padx = 80)
+        time1.grid(row = 1, column =1,padx = 80)
+        entry3.grid(row = 2, column =1,padx = 80)
+        time2.grid(row = 3, column =1,padx = 80)
+        entry5.grid(row = 4, column =1,padx = 80)
+
+        nextButton = ttk.Button(buttons, text = "Output", command = lambda : controller.show_frame(ViewOutput))
+        # backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(TNSConfig))
+        date1 = ttk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3)
+        date2 = ttk.Button(entry, text = ".", command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3)
+
+        # backButton.grid(column = 0,padx = 10)
+        nextButton.grid(row = 0,column = 1)
+        date1.grid(row=0,column=2,sticky="w")
+        date2.grid(row=2,column=2,sticky="w")
+
+
+class ViewOutput(tk.Frame):
 
     def __init__(self,parent, controller):
         tk.Frame.__init__(self, parent)
         
-        self.grid_columnconfigure(0,weight=1,minsize = 266)
-        self.grid_columnconfigure(1,weight=1,minsize = 266)
-        self.grid_columnconfigure(2,weight=1,minsize = 266)
+        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
 
-        title = tk.Label(self, text="Login", font=controller.headerFont)
+        title = tk.Label(self, text="Output", font=controller.headerFont)
         title.grid(pady=10,padx=10,columnspan = 3, sticky="w")
 
         separator = ttk.Separator(self,orient=tk.HORIZONTAL)
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
+
+        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
+        buttons.grid(row=3, column=0,pady = 0,padx=0, columnspan=3)
+
+        backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
+
+        backButton.grid()
 
 
 
