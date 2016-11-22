@@ -30,6 +30,7 @@ MINSIZEROW3 = 0
 MINSIZECOLUMN = 266
 ENTRYFRAMEPADX = 75
 ENTRYFRAMEPADY = 40
+BUTTONFRAMEPADX = 300
 calframe = None
 
 
@@ -131,7 +132,7 @@ class TNSConfig(tk.Frame):
         entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=350, columnspan=3,sticky="w")
+        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
 
         label1 = tk.Label(entry, text = "Railway Name :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "Division Name :",font=controller.defaultFont)
@@ -190,7 +191,7 @@ class DateTimeSetting(tk.Frame):
         entry.grid_columnconfigure(2,minsize=220)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,pady = 0,padx=350, columnspan=3,sticky="w")
+        buttons.grid(row=3, column=0,pady = 0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
 
         label1 = tk.Label(entry, text = "DATE :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "TIME :",font=controller.defaultFont)
@@ -274,6 +275,9 @@ class MainScreen(tk.Frame):
         display = tk.Frame(self)
         display.grid(row=2, column=0)
 
+        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
+        buttons.grid(row=3, column=0,pady = 0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
+
         grid1 = tk.Frame(display)
         grid1.pack()
 
@@ -317,8 +321,6 @@ class MainScreen(tk.Frame):
         degree3.grid(row=2,column=2)
 
 
-        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,pady = 0,padx=350, columnspan=3,sticky="w")
 
         menuButton = ttk.Button(buttons, text = "Menu", command = lambda : controller.show_frame(Menu))
 
@@ -345,6 +347,8 @@ class Menu(tk.Frame):
         display = tk.Frame(self)#,borderwidth=3,relief = tk.GROOVE)
         display.grid(row=2, column=0,pady = ENTRYFRAMEPADY,padx=200)
 
+        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
+        buttons.grid(row=3, column=0,pady = 0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
         # returnToMenu = True
         # print returnToMenu
 
@@ -358,8 +362,6 @@ class Menu(tk.Frame):
         button3.pack(side = "bottom",pady=10)
         button4.pack(side = "bottom",pady=10)
 
-        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,pady = 0,padx=350, columnspan=3,sticky="w")
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(MainScreen))
 
@@ -393,7 +395,7 @@ class Settings(tk.Frame):
         entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=300, columnspan=3,sticky="w")
+        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
 
         label1 = tk.Label(entry, text = "Max Temperature :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "Min Temperature :",font=controller.defaultFont)      
@@ -436,7 +438,7 @@ class Output(tk.Frame):
         entry.grid_columnconfigure(2,minsize=220)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,pady = 0,padx=350, columnspan=3,sticky="w")
+        buttons.grid(row=3, column=0,pady = 0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
 
         label1 = tk.Label(entry, text = "START DATE :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "START TIME :",font=controller.defaultFont)
@@ -522,7 +524,7 @@ class ViewOutput(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=350, columnspan=3,sticky="w")
+        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
 
@@ -532,6 +534,7 @@ class ViewOutput(tk.Frame):
 
 
 app = CRTApp()
+
 app.mainloop()
 
 
