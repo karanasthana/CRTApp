@@ -1,6 +1,9 @@
 import calendar
 import pcalender
 import time
+import datetime
+import os
+import glob
 
 try:
     import Tkinter as tk
@@ -10,6 +13,29 @@ except ImportError:
     import tkinter as tk
     import tkinter.font as tkFont
     import tkinter.ttk as ttk
+
+os.system('modprobe w1-gpio')
+os.system('modprobe w1-therm')
+
+base_dir='/sys/bus/w1/devices/'
+device_folder = glob.glob(base_dir + '28-000001db066d')[0]
+device_file = device_folder+'/w1_slave'
+
+def read_temp_raw():
+    f=open(device_file,'r')
+    lines=f.readlines()
+    f.close()
+    return lines
+
+def read_temp():
+    lines=read_temp_raw()
+    while lines[0].strip()[-3:]!='YES' :
+        lines=read_temp_raw()
+    equals_pos = lines[1].find('t=')
+    if equals_pos != -1:
+        temp_string = lines[1][equals_pos+2:]
+        temp_c = ("%.1f" % (float(temp_string)/1000.0))
+        return temp_c    
 
 HHLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
@@ -31,14 +57,29 @@ def get_calendar(locale, fwday):
         return calendar.LocaleTextCalendar(fwday, locale)
 
 def recorder(num = 1 ):
+    global app
+    global t1,t2,t3,date,time,rrr,sss,ddd,rrrr,ssss,div
+    if num is 1:
+        rrrr.configure(text=rrr)
+        ssss.configure(text=sss)
+        div.configure(text=ddd)
     if num:
-        print(num)
-        global app
-        global t1
-        t1.configure(text = num)
+        #print(num)
+        tt=read_temp()
+        today = str(datetime.datetime.now())
+        todaytime = str(today[12:19])
+        today= str(today[:10])
+        prev_date=today
+        prev_time=time
+        t1.configure(text = tt)
+        t2.configure(text = num+2)
+        t3.configure(text = num-2)
+        date.configure(text = today)
+        time.configure(text=todaytime)
+        #rrrr.configure(text=rrr)
+        
         app.after(1000, lambda:recorder(num+1))
-    else:
-        print("stopped")
+        """####JO FUNCTION CALL KAREGA, TO CHECK THE CHANGED VALUES, USMEI DATE,MAX,MIN KI JO PRESENT VALUE THHI, VOH PASS HOGI AS A PARAMETER"""
 
 
 
@@ -51,6 +92,8 @@ ENTRYFRAMEPADX = 75
 ENTRYFRAMEPADY = 40
 BUTTONFRAMEPADX = 310
 calframe = None
+
+global rrr,sss,ddd
 
 
 class CRTApp(tk.Tk):
@@ -163,6 +206,11 @@ class TNSConfig(tk.Frame):
         entry3 = tk.Entry(entry)
         entry4 = tk.Entry(entry)
 
+        global rr,ss,dd
+        rr=entry1
+        ss=entry2
+        dd=entry3
+
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
         label3.grid(row = 2, column =0,pady=10,sticky="e")
@@ -180,6 +228,10 @@ class TNSConfig(tk.Frame):
         # pcalender.__init__("Anupam")
     def local_show_frame(self,controller):
 
+        global sss,rrr,ddd
+        sss=ss.get()
+        rrr=rr.get()
+        ddd=dd.get()
         global returnToMenu
         # print returnToMenu
         if returnToMenu == True:
@@ -312,6 +364,7 @@ class MainScreen(tk.Frame):
         grid1.grid_columnconfigure(1,weight=1,minsize = 250)
         grid1.grid_columnconfigure(2,weight=1,minsize = 250)
 
+        global date,time,rrrr,ssss,div
         date = tk.Label(grid1, text = "DD/MM/YYYY",font = controller.defaultFont)
         time = tk.Label(grid1, text = "HH/MM",font = controller.defaultFont)
         rrrr = tk.Label(grid1, text = "RRRR",font = controller.defaultFont)
@@ -330,7 +383,7 @@ class MainScreen(tk.Frame):
         temp = tk.Label(grid2, text = "TEMPERATURE :",font = controller.defaultFont)
         mxtemp = tk.Label(grid2, text = "MAX TEMPERATURE :",font = controller.defaultFont)
         mntemp = tk.Label(grid2, text = "MIN TEMPERATURE :",font = controller.defaultFont)
-        global t1
+        global t1,t2,t3
         t1 = tk.Label(grid2, text = "XXX",font = controller.defaultFont)
         t2 = tk.Label(grid2, text = "XXX",font = controller.defaultFont)
         t3 = tk.Label(grid2, text = "XXX",font = controller.defaultFont)
