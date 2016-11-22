@@ -42,7 +42,7 @@ class CRTApp(tk.Tk):
         
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.wm_title(self,"CRTApp")
-        self.wm_geometry("720x480")
+        self.wm_geometry("800x480")
         self.wm_resizable( width=False, height=False)
         container = tk.Frame(self)
 
