@@ -4,16 +4,16 @@ classes.
 """
 import calendar
 
-# try:
-#     import Tkinter
-#     import tkFont
-# except ImportError: # py3k
-#     import tkinter as Tkinter
-#     import tkinter.font as tkFont
+try:
+    import Tkinter
+    import tkFont
+except ImportError: # py3k
+    import tkinter as Tkinter
+    import tkinter.font as tkFont
 
 import ttk
-import tkFont
-import Tkinter
+# import tkFont
+# import Tkinter
 
 def get_calendar(locale, fwday):
     # instantiate proper calendar class
@@ -194,7 +194,8 @@ class Calendar(ttk.Frame):
         self._selection = (text, item, column)
         # print self._selection[0]
         self._show_selection(text, bbox)
-        updateFunc(calframe,entryBox,self._selection[0],self._date.month,self._date.year)
+        if updateFunc :
+            updateFunc(calframe,entryBox,self._selection[0],self._date.month,self._date.year)
 
     def _prev_month(self):
         """Updated calendar to show the previous month."""

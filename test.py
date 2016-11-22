@@ -25,9 +25,11 @@ def get_calendar(locale, fwday):
 
 returnToMenu = False
 
-MINSIZEROW2 = 160
+MINSIZEROW2 = 180
 MINSIZEROW3 = 0
 MINSIZECOLUMN = 266
+ENTRYFRAMEPADX = 80
+calframe = None
 
 
 class CRTApp(tk.Tk):
@@ -40,7 +42,7 @@ class CRTApp(tk.Tk):
         
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.wm_title(self,"CRTApp")
-        self.wm_geometry("800x480")
+        self.wm_geometry("720x480")
         self.wm_resizable( width=False, height=False)
         container = tk.Frame(self)
 
@@ -73,6 +75,7 @@ class CRTApp(tk.Tk):
     def update(self, calframe,e,d,m,y):
 
         calframe.grid_forget()
+        # calframe.destroy()
 
         # YYYY = ttkcal._date.year
         # MM = ttkcal._date.month
@@ -85,15 +88,24 @@ class CRTApp(tk.Tk):
         e.delete(0, "end")
         e.insert(0,str(DD) + '-' + str(MM) + '-' + str(YYYY))
 
-    def call_calendar(self,f,x,y,e):
+    def call_calendar(self,container,x,y,e):
 
-        calframe= ttk.Frame(self,borderwidth=3,relief=tk.GROOVE)
+        global calframe
+        calframe = ttk.Frame(container,borderwidth=3,relief=tk.GROOVE)
         ttkcal = pcalender.Calendar(calframe,self.update,e,firstweekday=pcalender.calendar.SUNDAY)
         ttkcal.grid(row=0,column=0)
+
         # close = ttk.Button(calframe,text='x',width=1,command=lambda:qf())#self.update(calframe,e,ttkcal))
         # close.grid(row=0,column=1,sticky="nw")
         # calframe.grid(row=0,column=1,rowspan=4)
-        calframe.grid(pady=y+150,padx=x-10)
+
+        calframe.grid(row=0,column=2,rowspan=5)#pady=y+150,padx=x-10)
+
+        # calframe = tk.Toplevel(self)
+        # calframe.wm_geometry("800x480")
+
+        # ttkcal = pcalender.Calendar(calframe,self.update,e,firstweekday=pcalender.calendar.SUNDAY)
+        # ttkcal.pack(expand=1,fill="both")
         
 
 
@@ -115,10 +127,10 @@ class TNSConfig(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=75,padx=180)
+        entry.grid(row=2, column=0, pady=75,padx=ENTRYFRAMEPADX)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=0, columnspan=3)
+        buttons.grid(row=3, column=0,padx=350, columnspan=3,sticky="w")
 
         label1 = tk.Label(entry, text = "Railway Name :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "Division Name :",font=controller.defaultFont)
@@ -173,10 +185,11 @@ class DateTimeSetting(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=75,padx=180)
+        entry.grid(row=2, column=0, pady=75,padx=ENTRYFRAMEPADX)
+        entry.grid_columnconfigure(2,minsize=220)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,pady = 0,padx=0, columnspan=3)
+        buttons.grid(row=3, column=0,pady = 0,padx=350, columnspan=3,sticky="w")
 
         label1 = tk.Label(entry, text = "DATE :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "TIME :",font=controller.defaultFont)
@@ -211,18 +224,18 @@ class DateTimeSetting(tk.Frame):
         
         entry3 = tk.Entry(entry)
 
-        label1.grid(row = 0, column =0,pady=10,sticky="e")
-        label2.grid(row = 1, column =0,pady=10,sticky="e")
-        label3.grid(row = 2, column =0,pady=10,sticky="e")
-        label4.grid(row = 3, column =0,pady=10,sticky="e")
+        label1.grid(row = 0, column =0,pady=14,sticky="e")
+        label2.grid(row = 1, column =0,pady=14,sticky="e")
+        label3.grid(row = 2, column =0,pady=14,sticky="e")
+        label4.grid(row = 3, column =0,pady=14,sticky="e")
 
         entry1.grid(row = 0, column =1,padx = 80)
         time1.grid(row = 1, column =1,padx = 80)
         entry3.grid(row = 2, column =1,padx = 80)
         time2.grid(row = 3, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Start", command = lambda : controller.show_frame(MainScreen))
-        backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(TNSConfig))
+        nextButton = ttk.Button(buttons, text = "Start", command = lambda : self.local_show_frame(controller,MainScreen))
+        backButton = ttk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,TNSConfig))
         date1 = ttk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3)
         date2 = ttk.Button(entry, text = ".", command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3)
 
@@ -230,6 +243,13 @@ class DateTimeSetting(tk.Frame):
         nextButton.grid(row = 0,column = 1)
         date1.grid(row=0,column=2,sticky="w")
         date2.grid(row=2,column=2,sticky="w")
+
+    def local_show_frame(self,controller,f):
+
+        global calframe
+        if calframe :
+            calframe.grid_forget()
+        controller.show_frame(f)
 
 
 
@@ -297,7 +317,7 @@ class MainScreen(tk.Frame):
 
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,pady = 0,padx=0, columnspan=3)
+        buttons.grid(row=3, column=0,pady = 0,padx=350, columnspan=3,sticky="w")
 
         menuButton = ttk.Button(buttons, text = "Menu", command = lambda : controller.show_frame(Menu))
 
@@ -322,7 +342,7 @@ class Menu(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         display = tk.Frame(self)#,borderwidth=3,relief = tk.GROOVE)
-        display.grid(row=2, column=0,pady = 70,padx=250)
+        display.grid(row=2, column=0,pady = 70,padx=200)
 
         # returnToMenu = True
         # print returnToMenu
@@ -338,7 +358,7 @@ class Menu(tk.Frame):
         button4.pack(side = "bottom",pady=10)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,pady = 0,padx=0, columnspan=3)
+        buttons.grid(row=3, column=0,pady = 0,padx=350, columnspan=3,sticky="w")
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(MainScreen))
 
@@ -369,10 +389,10 @@ class Settings(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=75,padx=180)
+        entry.grid(row=2, column=0, pady=75,padx=ENTRYFRAMEPADX)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=0, columnspan=3)
+        buttons.grid(row=3, column=0,padx=300, columnspan=3,sticky="w")
 
         label1 = tk.Label(entry, text = "Max Temperature :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "Min Temperature :",font=controller.defaultFont)      
@@ -411,10 +431,11 @@ class Output(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=75,padx=180)
+        entry.grid(row=2, column=0, pady=75,padx=ENTRYFRAMEPADX)
+        entry.grid_columnconfigure(2,minsize=220)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,pady = 0,padx=0, columnspan=3)
+        buttons.grid(row=3, column=0,pady = 0,padx=350, columnspan=3,sticky="w")
 
         label1 = tk.Label(entry, text = "START DATE :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "START TIME :",font=controller.defaultFont)
@@ -464,15 +485,22 @@ class Output(tk.Frame):
         time2.grid(row = 3, column =1,padx = 80)
         entry5.grid(row = 4, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Output", command = lambda : controller.show_frame(ViewOutput))
-        # backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(TNSConfig))
+        nextButton = ttk.Button(buttons, text = "Output", command = lambda : self.local_show_frame(controller,ViewOutput))
+        backButton = ttk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,Menu))
         date1 = ttk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3)
         date2 = ttk.Button(entry, text = ".", command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3)
 
-        # backButton.grid(column = 0,padx = 10)
+        backButton.grid(column = 0,padx = 10)
         nextButton.grid(row = 0,column = 1)
         date1.grid(row=0,column=2,sticky="w")
         date2.grid(row=2,column=2,sticky="w")
+
+    def local_show_frame(self,controller,f):
+
+        global calframe
+        if calframe:
+            calframe.grid_forget()
+        controller.show_frame(f)
 
 
 class ViewOutput(tk.Frame):
@@ -493,7 +521,7 @@ class ViewOutput(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,pady = 0,padx=0, columnspan=3)
+        buttons.grid(row=3, column=0,padx=350, columnspan=3,sticky="w")
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
 
