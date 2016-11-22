@@ -29,6 +29,7 @@ MINSIZEROW2 = 180
 MINSIZEROW3 = 0
 MINSIZECOLUMN = 266
 ENTRYFRAMEPADX = 75
+ENTRYFRAMEPADY = 40
 calframe = None
 
 
@@ -127,7 +128,7 @@ class TNSConfig(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=75,padx=ENTRYFRAMEPADX)
+        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
         buttons.grid(row=3, column=0,padx=350, columnspan=3,sticky="w")
@@ -185,7 +186,7 @@ class DateTimeSetting(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=75,padx=ENTRYFRAMEPADX)
+        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
         entry.grid_columnconfigure(2,minsize=220)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
@@ -342,7 +343,7 @@ class Menu(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         display = tk.Frame(self)#,borderwidth=3,relief = tk.GROOVE)
-        display.grid(row=2, column=0,pady = 70,padx=200)
+        display.grid(row=2, column=0,pady = ENTRYFRAMEPADY,padx=200)
 
         # returnToMenu = True
         # print returnToMenu
@@ -389,7 +390,7 @@ class Settings(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=75,padx=ENTRYFRAMEPADX)
+        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
         buttons.grid(row=3, column=0,padx=300, columnspan=3,sticky="w")
@@ -431,7 +432,7 @@ class Output(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=75,padx=ENTRYFRAMEPADX)
+        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
         entry.grid_columnconfigure(2,minsize=220)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
