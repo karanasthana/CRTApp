@@ -1,5 +1,6 @@
 import calendar
 import pcalender
+import time
 
 try:
     import Tkinter as tk
@@ -28,6 +29,18 @@ def get_calendar(locale, fwday):
         return calendar.TextCalendar(fwday)
     else:
         return calendar.LocaleTextCalendar(fwday, locale)
+
+def recorder(num = 1 ):
+    if num:
+        print(num)
+        global app
+        global t1
+        t1.configure(text = num)
+        app.after(1000, lambda:recorder(num+1))
+    else:
+        print("stopped")
+
+
 
 returnToMenu = False
 
@@ -242,7 +255,7 @@ class DateTimeSetting(tk.Frame):
         entry3.grid(row = 2, column =1,padx = 80)
         time2.grid(row = 3, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Start", command = lambda : self.local_show_frame(controller,MainScreen))
+        nextButton = ttk.Button(buttons, text = "Start", command = lambda : self.start_recording(controller))
         backButton = ttk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,TNSConfig))
         date1 = ttk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3)
         date2 = ttk.Button(entry, text = ".", command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3)
@@ -258,6 +271,14 @@ class DateTimeSetting(tk.Frame):
         if calframe :
             calframe.grid_forget()
         controller.show_frame(f)
+
+    def start_recording(self,controller):
+        controller.show_frame(MainScreen)
+        recorder()
+        
+
+
+
 
 
 
@@ -309,6 +330,7 @@ class MainScreen(tk.Frame):
         temp = tk.Label(grid2, text = "TEMPERATURE :",font = controller.defaultFont)
         mxtemp = tk.Label(grid2, text = "MAX TEMPERATURE :",font = controller.defaultFont)
         mntemp = tk.Label(grid2, text = "MIN TEMPERATURE :",font = controller.defaultFont)
+        global t1
         t1 = tk.Label(grid2, text = "XXX",font = controller.defaultFont)
         t2 = tk.Label(grid2, text = "XXX",font = controller.defaultFont)
         t3 = tk.Label(grid2, text = "XXX",font = controller.defaultFont)
@@ -331,6 +353,15 @@ class MainScreen(tk.Frame):
         menuButton = ttk.Button(buttons, text = "Menu", command = lambda : controller.show_frame(Menu))
 
         menuButton.grid()
+
+        # self.Refresher(t1)
+
+    def Refresher(self,l):
+
+        l.configure(text = time.asctime())
+        # app.after(1000, self.Refresher)
+
+
 
 
 class Menu(tk.Frame):
@@ -538,7 +569,7 @@ class ViewOutput(tk.Frame):
 
 
 
-
+global app
 app = CRTApp()
 
 app.mainloop()
