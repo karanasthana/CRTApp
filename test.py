@@ -1,8 +1,14 @@
-import Tkinter as tk
-import tkFont
-import ttk
 import calendar
 import pcalender
+
+try:
+    import Tkinter as tk
+    import tkFont
+    import ttk
+except ImportError:
+    import tkinter as tk
+    import tkinter.font as tkFont
+    import tkinter.ttk as ttk
 
 HHLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
@@ -14,7 +20,7 @@ MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
 def qf():
-    print "done"
+    print ("done")
 
 def get_calendar(locale, fwday):
     # instantiate proper calendar class

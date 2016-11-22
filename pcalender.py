@@ -7,11 +7,11 @@ import calendar
 try:
     import Tkinter
     import tkFont
+    import ttk
 except ImportError: # py3k
     import tkinter as Tkinter
     import tkinter.font as tkFont
-
-import ttk
+    import tkinter.ttk as ttk
 # import tkFont
 # import Tkinter
 
@@ -246,7 +246,7 @@ def test():
     
 
     root.mainloop()
-    print ttkcal.selection
+    print (ttkcal.selection)
 
 if __name__ == '__main__':
     test()
