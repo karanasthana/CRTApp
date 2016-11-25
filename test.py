@@ -2,8 +2,10 @@ import calendar
 import pcalender
 import time
 import datetime
-import os
-import glob
+import re
+import tkMessageBox
+# import os
+# import glob
 
 try:
     import Tkinter as tk
@@ -14,28 +16,32 @@ except ImportError:
     import tkinter.font as tkFont
     import tkinter.ttk as ttk
 
-os.system('modprobe w1-gpio')
-os.system('modprobe w1-therm')
+def errorBox(msg):
 
-base_dir='/sys/bus/w1/devices/'
-device_folder = glob.glob(base_dir + '28-000001db066d')[0]
-device_file = device_folder+'/w1_slave'
+	tkMessageBox.showerror("Error", msg)
 
-def read_temp_raw():
-    f=open(device_file,'r')
-    lines=f.readlines()
-    f.close()
-    return lines
+# os.system('modprobe w1-gpio')
+# os.system('modprobe w1-therm')
 
-def read_temp():
-    lines=read_temp_raw()
-    while lines[0].strip()[-3:]!='YES' :
-        lines=read_temp_raw()
-    equals_pos = lines[1].find('t=')
-    if equals_pos != -1:
-        temp_string = lines[1][equals_pos+2:]
-        temp_c = ("%.1f" % (float(temp_string)/1000.0))
-        return temp_c    
+# base_dir='/sys/bus/w1/devices/'
+# device_folder = glob.glob(base_dir + '28-000001db066d')[0]
+# device_file = device_folder+'/w1_slave'
+
+# def read_temp_raw():
+#     f=open(device_file,'r')
+#     lines=f.readlines()
+#     f.close()
+#     return lines
+
+# def read_temp():
+#     lines=read_temp_raw()
+#     while lines[0].strip()[-3:]!='YES' :
+#         lines=read_temp_raw()
+#     equals_pos = lines[1].find('t=')
+#     if equals_pos != -1:
+#         temp_string = lines[1][equals_pos+2:]
+#         temp_c = ("%.1f" % (float(temp_string)/1000.0))
+#         return temp_c    
 
 HHLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
@@ -60,26 +66,24 @@ def recorder(num = 1 ):
     global app
     global t1,t2,t3,date,time,rrr,sss,ddd,rrrr,ssss,div
     if num is 1:
-        rrrr.configure(text=rrr)
-        ssss.configure(text=sss)
-        div.configure(text=ddd)
+        rrrr.configure(text=rrr.upper())
+        ssss.configure(text=sss.upper())
+        div.configure(text=ddd.upper())
     if num:
-        #print(num)
-        tt=read_temp()
-        today = str(datetime.datetime.now())
+        # tt=read_temp()
+        global secondGap
+        today = str(datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
         todaytime = str(today[12:19])
         today= str(today[:10])
         prev_date=today
         prev_time=time
-        t1.configure(text = tt)
+        t1.configure(text = 1)
         t2.configure(text = num+2)
         t3.configure(text = num-2)
         date.configure(text = today)
-        time.configure(text=todaytime)
-        #rrrr.configure(text=rrr)
-        
+        time.configure(text=todaytime)       
         app.after(1000, lambda:recorder(num+1))
-        """####JO FUNCTION CALL KAREGA, TO CHECK THE CHANGED VALUES, USMEI DATE,MAX,MIN KI JO PRESENT VALUE THHI, VOH PASS HOGI AS A PARAMETER"""
+        ####JO FUNCTION CALL KAREGA, TO CHECK THE CHANGED VALUES, USMEI DATE,MAX,MIN KI JO PRESENT VALUE THHI, VOH PASS HOGI AS A PARAMETER
 
 
 
@@ -94,6 +98,22 @@ BUTTONFRAMEPADX = 310
 calframe = None
 
 global rrr,sss,ddd
+
+
+class AutoScrollbar(tk.Scrollbar):
+    # A scrollbar that hides itself if it's not needed.
+    # Only works if you use the grid geometry manager!
+    def set(self, lo, hi):
+        if float(lo) <= 0.0 and float(hi) >= 1.0:
+            # grid_remove is currently missing from Tkinter!
+            self.tk.call("grid", "remove", self)
+        else:
+            self.grid()
+        tk.Scrollbar.set(self, lo, hi)
+    def pack(self, **kw):
+        raise TclError("cannot use pack with this widget")
+    def place(self, **kw):
+        raise TclError("cannot use place with this widget")
 
 
 class CRTApp(tk.Tk):
@@ -123,13 +143,13 @@ class CRTApp(tk.Tk):
 
         self.frames = {}
 
-        for F in (TNSConfig, DateTimeSetting, MainScreen, Menu, Settings, Output, ViewOutput ):
+        for F in (TMSConfig, DateTimeSetting, MainScreen, Menu, Settings, Output, ViewOutput ):
 
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(TNSConfig)
+        self.show_frame(TMSConfig)
 
     def show_frame(self, cont):
 
@@ -173,7 +193,7 @@ class CRTApp(tk.Tk):
         
 
 
-class TNSConfig(tk.Frame):
+class TMSConfig(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -184,7 +204,7 @@ class TNSConfig(tk.Frame):
         self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
         self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
         
-        title = tk.Label(self, text="TNS Configuration", font=controller.headerFont)
+        title = tk.Label(self, text="TMS Configuration", font=controller.headerFont)
         title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
 
         separator = ttk.Separator(self,orient=tk.HORIZONTAL)
@@ -206,7 +226,7 @@ class TNSConfig(tk.Frame):
         entry3 = tk.Entry(entry)
         entry4 = tk.Entry(entry)
 
-        global rr,ss,dd
+        # global rr,ss,dd
         rr=entry1
         ss=entry2
         dd=entry3
@@ -221,23 +241,55 @@ class TNSConfig(tk.Frame):
         entry3.grid(row = 2, column =1,padx = 80)
         entry4.grid(row = 3, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller))
+        nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2,entry3,entry4))
 
         nextButton.grid()
         # print self.grid_size()
         # pcalender.__init__("Anupam")
-    def local_show_frame(self,controller):
+    def local_show_frame(self,controller,rr,dd,ss,mn):
 
         global sss,rrr,ddd
-        sss=ss.get()
-        rrr=rr.get()
-        ddd=dd.get()
-        global returnToMenu
-        # print returnToMenu
-        if returnToMenu == True:
-            controller.show_frame(Menu)
+
+        flag = 0
+
+        w=mn.get()
+        x=rr.get()
+        y=dd.get()
+        z=ss.get()
+        m = re.search("^[a-zA-Z]{1,4}$",x)
+        n = re.search("^[a-zA-Z]{1,4}$",y)
+        o = re.search("^[a-zA-Z]{1,4}$",z)
+        if m:
+        	rrr = x
+        	if n:
+        		ddd = y
+        		if o:
+        			sss = z
+        		else:
+        			flag = 3
+        	else:
+        		flag = 2
         else:
-            controller.show_frame(DateTimeSetting)
+        	flag = 1
+
+        if flag == 1:
+        	errorBox("Invalid Railway Name")
+        elif flag == 2:
+        	errorBox("Invalid Division Name")
+        elif flag == 3:
+        	errorBox("Invalid Station Name")
+        elif not w:
+        	errorBox("Please Enter Model Number")
+        else:
+	        global returnToMenu
+	        # print returnToMenu
+	        if returnToMenu == True:
+	            controller.show_frame(Menu)
+	        else:
+	            controller.show_frame(DateTimeSetting)
+        	
+
+       	
 
 
 
@@ -307,8 +359,8 @@ class DateTimeSetting(tk.Frame):
         entry3.grid(row = 2, column =1,padx = 80)
         time2.grid(row = 3, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Start", command = lambda : self.start_recording(controller))
-        backButton = ttk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,TNSConfig))
+        nextButton = ttk.Button(buttons, text = "Start", command = lambda : self.start_recording(controller,HH1,MM1,HH2,MM2,entry1,entry3))
+        backButton = ttk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,TMSConfig))
         date1 = ttk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3)
         date2 = ttk.Button(entry, text = ".", command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3)
 
@@ -319,18 +371,57 @@ class DateTimeSetting(tk.Frame):
 
     def local_show_frame(self,controller,f):
 
-        global calframe
-        if calframe :
-            calframe.grid_forget()
-        controller.show_frame(f)
+		global calframe
+		if calframe :
+			calframe.grid_forget()
+		controller.show_frame(f)
 
-    def start_recording(self,controller):
-        controller.show_frame(MainScreen)
-        recorder()
-        
+    def start_recording(self,controller,hh1,mm1,hh2,mm2,cdate,sdate):
 
+    	a = hh1.get()
+    	b = mm1.get()
+    	c = hh2.get()
+    	d = mm2.get()
+    	e = cdate.get()
+    	f = sdate.get()
 
-
+    	if not (a and b and c and d and e and f):
+    		if e:
+    			if a:
+    				if b:
+    					if f:
+    						if c:
+    							if d:
+    								pass
+    							else:
+    								errorBox("Please Enter Starting Minutes")
+    						else:
+    							errorBox("Please Enter Starting Hour")
+    					else:
+    						errorBox("Please Enter Starting Date")
+    				else:
+    					errorBox("Please Enter Current Minutes")
+    			else:
+    				errorBox("Please Enter Current Hours")
+    		else:
+    			errorBox("Please Enter Current Date")
+    	else:
+    		current_date = e + " " + a +":" + b + ":00"
+    		start_date = f + " " + c +":" + d + ":00"
+    		# print current_date,start_date
+    		a=str(datetime.datetime.now())
+    		current=str(a[:10])+" "+str(a[11:19])
+    		actualtime=datetime.datetime.strptime(current,"%Y-%m-%d %H:%M:%S")
+    		current_date=datetime.datetime.strptime(current_date, "%d-%m-%Y %H:%M:%S")
+    		start_date=datetime.datetime.strptime(start_date, "%d-%m-%Y %H:%M:%S")
+    		if current_date > start_date:
+    			errorBox("Starting Date-Time should be greater")
+    		else:
+    			delta=current_date-actualtime
+    			global secondGap
+    			secondGap= delta.seconds + delta.days*86400
+    			controller.show_frame(MainScreen)
+    			recorder()
 
 
 
@@ -364,7 +455,8 @@ class MainScreen(tk.Frame):
         grid1.grid_columnconfigure(1,weight=1,minsize = 250)
         grid1.grid_columnconfigure(2,weight=1,minsize = 250)
 
-        global date,time,rrrr,ssss,div
+        global date,time,rrrr,ssss,div,t1,t2,t3
+
         date = tk.Label(grid1, text = "DD/MM/YYYY",font = controller.defaultFont)
         time = tk.Label(grid1, text = "HH/MM",font = controller.defaultFont)
         rrrr = tk.Label(grid1, text = "RRRR",font = controller.defaultFont)
@@ -383,7 +475,7 @@ class MainScreen(tk.Frame):
         temp = tk.Label(grid2, text = "TEMPERATURE :",font = controller.defaultFont)
         mxtemp = tk.Label(grid2, text = "MAX TEMPERATURE :",font = controller.defaultFont)
         mntemp = tk.Label(grid2, text = "MIN TEMPERATURE :",font = controller.defaultFont)
-        global t1,t2,t3
+
         t1 = tk.Label(grid2, text = "XXX",font = controller.defaultFont)
         t2 = tk.Label(grid2, text = "XXX",font = controller.defaultFont)
         t3 = tk.Label(grid2, text = "XXX",font = controller.defaultFont)
@@ -406,13 +498,6 @@ class MainScreen(tk.Frame):
         menuButton = ttk.Button(buttons, text = "Menu", command = lambda : controller.show_frame(Menu))
 
         menuButton.grid()
-
-        # self.Refresher(t1)
-
-    def Refresher(self,l):
-
-        l.configure(text = time.asctime())
-        # app.after(1000, self.Refresher)
 
 
 
@@ -442,7 +527,7 @@ class Menu(tk.Frame):
         # returnToMenu = True
         # print returnToMenu
 
-        button1 = tk.Button(display, text = "TNS Configuration", command = lambda : self.local_show_frame(controller),width=30)
+        button1 = tk.Button(display, text = "TMS Configuration", command = lambda : self.local_show_frame(controller),width=30)
         button2 = tk.Button(display, text = "Export", command = qf,width=30)
         button3 = tk.Button(display, text = "View Output", command = lambda : controller.show_frame(Output),width=30)
         button4 = tk.Button(display, text = "Settings", command = lambda : controller.show_frame(Settings),width=30)
@@ -461,7 +546,7 @@ class Menu(tk.Frame):
 
         global returnToMenu
         returnToMenu = True
-        controller.show_frame(TNSConfig)
+        controller.show_frame(TMSConfig)
 
 
 class Settings(tk.Frame):
@@ -578,7 +663,7 @@ class Output(tk.Frame):
         time2.grid(row = 3, column =1,padx = 80)
         entry5.grid(row = 4, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Output", command = lambda : self.local_show_frame(controller,ViewOutput))
+        nextButton = ttk.Button(buttons, text = "Output", command = lambda : self.validate(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5))
         backButton = ttk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,Menu))
         date1 = ttk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3)
         date2 = ttk.Button(entry, text = ".", command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3)
@@ -594,6 +679,62 @@ class Output(tk.Frame):
         if calframe:
             calframe.grid_forget()
         controller.show_frame(f)
+
+    def validate(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
+
+        a = hh1.get()
+        b = mm1.get()
+        c = hh2.get()
+        d = mm2.get()
+        e = sdate.get()
+        f = edate.get()
+        g = intr.get()
+        h = re.search("^[0-9]+$",g)
+        # print h.group(0)
+
+        if not (a and b and c and d and e and f and h):
+            if e:
+                if a:
+                    if b:
+                        if f:
+                            if c:
+                                if d:
+                                    if h != None:
+                                        pass
+                                    else:
+                                        errorBox("Enter Valid Time Interval in Minutes")
+                                else:
+                                    errorBox("Please Enter Ending Minutes")
+                            else:
+                                errorBox("Please Enter Ending Hour")
+                        else:
+                            errorBox("Please Enter Ending Date")
+                    else:
+                        errorBox("Please Enter Starting Minutes")
+                else:
+                    errorBox("Please Enter Starting Hours")
+            else:
+                errorBox("Please Enter Starting Date")
+        else:
+            start_date = e + " " + a +":" + b + ":00"
+            end_date = f + " " + c +":" + d + ":00"
+            # print current_date,start_date
+            a=str(datetime.datetime.now())
+            current=str(a[:10])+" "+str(a[11:19])
+            actualtime=datetime.datetime.strptime(current,"%Y-%m-%d %H:%M:%S")
+            start_date=datetime.datetime.strptime(start_date, "%d-%m-%Y %H:%M:%S")
+            end_date=datetime.datetime.strptime(end_date, "%d-%m-%Y %H:%M:%S")
+            if start_date > end_date:
+                errorBox("Ending Date-Time should be greater")
+            else:
+                delta=start_date-actualtime
+                # global secondGap
+                # secondGap= delta.seconds + delta.days*86400
+                global calframe
+                if calframe:
+                    calframe.grid_forget()
+                controller.show_frame(ViewOutput)
+                # recorder()
 
 
 class ViewOutput(tk.Frame):
@@ -615,6 +756,39 @@ class ViewOutput(tk.Frame):
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
         buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
+
+        outputFrame = tk.Frame(self)
+        outputFrame.grid(row=0,column=0,sticky="nsew")
+        # outputFrame.grid_rowconfigure(0, weight=1)
+        # outputFrame.grid_columnconfigure(0, weight=1)
+        vscrollbar = AutoScrollbar(outputFrame)
+        vscrollbar.grid(row=0, column=1, sticky="ns")
+        # hscrollbar = AutoScrollbar(outputFrame, orient="horizontal")
+        # hscrollbar.grid(row=1, column=0, sticky="ew")
+        canvas = tk.Canvas(outputFrame, yscrollcommand=vscrollbar.set)#, xscrollcommand=hscrollbar.set)
+        canvas.grid(row=0, column=0, sticky="nsew")
+        vscrollbar.config(command=canvas.yview)
+        # hscrollbar.config(command=canvas.xview)
+        outputFrame.grid_rowconfigure(0, weight=1)
+        outputFrame.grid_columnconfigure(0, weight=1)
+        frame = tk.Text(canvas, state="normal",width=100)
+        frame.insert(tk.INSERT,"""""")
+        frame.config(state="disabled")
+        # frame.rowconfigure(1, weight=1)
+        # frame.columnconfigure(1, weight=1)
+
+        # rows = 12
+        # for i in range(1, rows):
+        #     for j in range(1, 10):
+        #         button = tk.Button(frame, text="%d, %d" % (i,j))
+        #         button.grid(row=i, column=j, sticky='news')
+
+        canvas.create_window(0, 0, anchor="nw", window=frame)
+        frame.update_idletasks()
+        canvas.config(scrollregion=canvas.bbox("all"))
+
+        outputFrame.grid(row=2,column=0,pady=ENTRYFRAMEPADY,padx=35,columnspan=3)
+
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
 
