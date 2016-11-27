@@ -4,7 +4,7 @@ import time
 import datetime
 import re
 import tkMessageBox
-# import os
+import os
 # import glob
 
 try:
@@ -143,7 +143,7 @@ class CRTApp(tk.Tk):
 
         self.frames = {}
 
-        for F in (TMSConfig, DateTimeSetting, MainScreen, Menu, Settings, Output, ViewOutput ):
+        for F in (Login, TMSConfig, DateTimeSetting, MainScreen, Menu, Settings, Output, ViewOutput ):
 
             frame = F(container, self)
             self.frames[F] = frame
@@ -226,10 +226,10 @@ class TMSConfig(tk.Frame):
         entry3 = tk.Entry(entry)
         entry4 = tk.Entry(entry)
 
-        # global rr,ss,dd
-        rr=entry1
-        ss=entry2
-        dd=entry3
+        entry1.bind("<FocusIn>",self.call_keyboard)
+        entry2.bind("<FocusIn>",self.call_keyboard)
+        entry3.bind("<FocusIn>",self.call_keyboard)
+        entry4.bind("<FocusIn>",self.call_keyboard)
 
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
@@ -246,6 +246,10 @@ class TMSConfig(tk.Frame):
         nextButton.grid()
         # print self.grid_size()
         # pcalender.__init__("Anupam")
+
+    def call_keyboard(self,event):
+        os.system("matchbox-keyboard")
+
     def local_show_frame(self,controller,rr,dd,ss,mn):
 
         global sss,rrr,ddd
@@ -286,11 +290,8 @@ class TMSConfig(tk.Frame):
 	        if returnToMenu == True:
 	            controller.show_frame(Menu)
 	        else:
-	            controller.show_frame(DateTimeSetting)
-        	
-
-       	
-
+	            returnToMenu = True
+                controller.show_frame(DateTimeSetting)
 
 
 class DateTimeSetting(tk.Frame):
@@ -495,7 +496,7 @@ class MainScreen(tk.Frame):
 
 
 
-        menuButton = ttk.Button(buttons, text = "Menu", command = lambda : controller.show_frame(Menu))
+        menuButton = ttk.Button(buttons, text = "Menu", command = lambda : controller.show_frame(Login))
 
         menuButton.grid()
 
@@ -544,8 +545,6 @@ class Menu(tk.Frame):
 
     def local_show_frame(self, controller):
 
-        global returnToMenu
-        returnToMenu = True
         controller.show_frame(TMSConfig)
 
 
@@ -774,14 +773,6 @@ class ViewOutput(tk.Frame):
         frame = tk.Text(canvas, state="normal",width=100)
         frame.insert(tk.INSERT,"""""")
         frame.config(state="disabled")
-        # frame.rowconfigure(1, weight=1)
-        # frame.columnconfigure(1, weight=1)
-
-        # rows = 12
-        # for i in range(1, rows):
-        #     for j in range(1, 10):
-        #         button = tk.Button(frame, text="%d, %d" % (i,j))
-        #         button.grid(row=i, column=j, sticky='news')
 
         canvas.create_window(0, 0, anchor="nw", window=frame)
         frame.update_idletasks()
@@ -793,6 +784,71 @@ class ViewOutput(tk.Frame):
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
 
         backButton.grid()
+
+class Login(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        # self.grid_rowconfigure(0,weight=1,minsize = 80)
+        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
+        
+        title = tk.Label(self, text="Login", font=controller.headerFont)
+        title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
+
+        separator = ttk.Separator(self,orient=tk.HORIZONTAL)
+        separator.grid(row=1,column=0,columnspan=3,sticky="ew")
+
+        entry = tk.Frame(self)
+        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
+
+        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
+        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
+
+        label1 = tk.Label(entry, text = "Username :",font = controller.defaultFont)
+        label2 = tk.Label(entry, text = "Password :",font=controller.defaultFont)       
+        
+        entry1 = tk.Entry(entry)
+        entry2 = tk.Entry(entry)
+
+        label1.grid(row = 0, column =0,pady=10,sticky="e")
+        label2.grid(row = 1, column =0,pady=10,sticky="e")
+
+        entry1.grid(row = 0, column =1,padx = 80)
+        entry2.grid(row = 1, column =1,padx = 80)
+
+        nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2))
+
+        nextButton.grid()
+        
+    def local_show_frame(self,controller,user,passw):
+
+        global sss,rrr,ddd
+
+        flag = 0
+
+        u=user.get()
+        p=passw.get()
+
+        user.delete(0,"end")
+        passw.delete(0,"end")
+        
+        if u == "anupam" and p == "singh":
+            flag = 1
+
+        
+        if flag == 1:
+            global returnToMenu
+            # print returnToMenu
+            if returnToMenu == True:
+                controller.show_frame(Menu)
+            else:
+                controller.show_frame(TMSConfig)
+        else:
+            errorBox("Invalid Username Password")
 
 
 
