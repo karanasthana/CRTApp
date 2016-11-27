@@ -149,7 +149,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(TMSConfig)
+        self.show_frame(Login)
 
     def show_frame(self, cont):
 
@@ -812,7 +812,7 @@ class Login(tk.Frame):
         label2 = tk.Label(entry, text = "Password :",font=controller.defaultFont)       
         
         entry1 = tk.Entry(entry)
-        entry2 = tk.Entry(entry)
+        entry2 = tk.Entry(entry,show="*")
 
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
