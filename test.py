@@ -6,6 +6,7 @@ import re
 import tkMessageBox
 import os
 # import glob
+import subprocess
 
 try:
     import Tkinter as tk
@@ -231,6 +232,11 @@ class TMSConfig(tk.Frame):
         entry3.bind("<FocusIn>",self.call_keyboard)
         entry4.bind("<FocusIn>",self.call_keyboard)
 
+        entry1.bind("<FocusOut>",self.close_keyboard)
+        entry2.bind("<FocusOut>",self.close_keyboard)
+        entry3.bind("<FocusOut>",self.close_keyboard)
+        entry4.bind("<FocusOut>",self.close_keyboard)
+
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
         label3.grid(row = 2, column =0,pady=10,sticky="e")
@@ -248,7 +254,11 @@ class TMSConfig(tk.Frame):
         # pcalender.__init__("Anupam")
 
     def call_keyboard(self,event):
-        os.system("matchbox-keyboard")
+        subprocess.Popen("matchbox-keyboard")
+
+    def close_keyboard(self,event):
+        os.system("killall matchbox-keyboard")
+        # subprocess.Popen("killall matchbox-keyboard")
 
     def local_show_frame(self,controller,rr,dd,ss,mn):
 
@@ -285,12 +295,11 @@ class TMSConfig(tk.Frame):
         elif not w:
         	errorBox("Please Enter Model Number")
         else:
-	        global returnToMenu
-	        # print returnToMenu
-	        if returnToMenu == True:
-	            controller.show_frame(Menu)
-	        else:
-	            returnToMenu = True
+            global returnToMenu
+            print returnToMenu
+            if returnToMenu==True:
+                controller.show_frame(Menu)
+            else:
                 controller.show_frame(DateTimeSetting)
 
 
@@ -496,9 +505,16 @@ class MainScreen(tk.Frame):
 
 
 
-        menuButton = ttk.Button(buttons, text = "Menu", command = lambda : controller.show_frame(Login))
+        menuButton = ttk.Button(buttons, text = "Menu", command = lambda :self.local_show_frame(controller))
 
         menuButton.grid()
+
+    def local_show_frame(self,controller):
+
+        global returnToMenu
+        returnToMenu = True
+
+        controller.show_frame(Login)
 
 
 
@@ -842,7 +858,7 @@ class Login(tk.Frame):
         
         if flag == 1:
             global returnToMenu
-            # print returnToMenu
+            print returnToMenu
             if returnToMenu == True:
                 controller.show_frame(Menu)
             else:
