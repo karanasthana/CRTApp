@@ -191,6 +191,12 @@ class CRTApp(tk.Tk):
 
         # ttkcal = pcalender.Calendar(calframe,self.update,e,firstweekday=pcalender.calendar.SUNDAY)
         # ttkcal.pack(expand=1,fill="both")
+
+    def call_keyboard(self,event):
+        subprocess.Popen("matchbox-keyboard")
+
+    def close_keyboard(self,event):
+        os.system("killall matchbox-keyboard")
         
 
 
@@ -227,15 +233,15 @@ class TMSConfig(tk.Frame):
         entry3 = tk.Entry(entry)
         entry4 = tk.Entry(entry)
 
-        entry1.bind("<FocusIn>",self.call_keyboard)
-        entry2.bind("<FocusIn>",self.call_keyboard)
-        entry3.bind("<FocusIn>",self.call_keyboard)
-        entry4.bind("<FocusIn>",self.call_keyboard)
+        entry1.bind("<FocusIn>",controller.call_keyboard)
+        entry2.bind("<FocusIn>",controller.call_keyboard)
+        entry3.bind("<FocusIn>",controller.call_keyboard)
+        entry4.bind("<FocusIn>",controller.call_keyboard)
 
-        entry1.bind("<FocusOut>",self.close_keyboard)
-        entry2.bind("<FocusOut>",self.close_keyboard)
-        entry3.bind("<FocusOut>",self.close_keyboard)
-        entry4.bind("<FocusOut>",self.close_keyboard)
+        entry1.bind("<FocusOut>",controller.close_keyboard)
+        entry2.bind("<FocusOut>",controller.close_keyboard)
+        entry3.bind("<FocusOut>",controller.close_keyboard)
+        entry4.bind("<FocusOut>",controller.close_keyboard)
 
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
@@ -252,12 +258,6 @@ class TMSConfig(tk.Frame):
         nextButton.grid()
         # print self.grid_size()
         # pcalender.__init__("Anupam")
-
-    def call_keyboard(self,event):
-        subprocess.Popen("matchbox-keyboard")
-
-    def close_keyboard(self,event):
-        os.system("killall matchbox-keyboard")
         # subprocess.Popen("killall matchbox-keyboard")
 
     def local_show_frame(self,controller,rr,dd,ss,mn):
@@ -296,7 +296,7 @@ class TMSConfig(tk.Frame):
         	errorBox("Please Enter Model Number")
         else:
             global returnToMenu
-            print returnToMenu
+            # print returnToMenu
             if returnToMenu==True:
                 controller.show_frame(Menu)
             else:
@@ -593,6 +593,12 @@ class Settings(tk.Frame):
         entry1 = tk.Entry(entry)
         entry2 = tk.Entry(entry)
 
+        entry1.bind("<FocusIn>",controller.call_keyboard)
+        entry2.bind("<FocusIn>",controller.call_keyboard)
+
+        entry1.bind("<FocusOut>",controller.close_keyboard)
+        entry2.bind("<FocusOut>",controller.close_keyboard)
+
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
 
@@ -677,6 +683,10 @@ class Output(tk.Frame):
         entry3.grid(row = 2, column =1,padx = 80)
         time2.grid(row = 3, column =1,padx = 80)
         entry5.grid(row = 4, column =1,padx = 80)
+
+        entry5.bind("<FocusIn>",controller.call_keyboard)
+
+        entry5.bind("<FocusOut>",controller.close_keyboard)
 
         nextButton = ttk.Button(buttons, text = "Output", command = lambda : self.validate(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5))
         backButton = ttk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,Menu))
@@ -836,6 +846,12 @@ class Login(tk.Frame):
         entry1.grid(row = 0, column =1,padx = 80)
         entry2.grid(row = 1, column =1,padx = 80)
 
+        entry1.bind("<FocusIn>",controller.call_keyboard)
+        entry2.bind("<FocusIn>",controller.call_keyboard)
+
+        entry1.bind("<FocusOut>",controller.close_keyboard)
+        entry2.bind("<FocusOut>",controller.close_keyboard)
+
         nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2))
 
         nextButton.grid()
@@ -858,7 +874,7 @@ class Login(tk.Frame):
         
         if flag == 1:
             global returnToMenu
-            print returnToMenu
+            # print returnToMenu
             if returnToMenu == True:
                 controller.show_frame(Menu)
             else:
