@@ -140,6 +140,15 @@ def inputBox():
 
     button = tk.Button(ibox,text = "Export", command=lambda:dummyDone(ibox))
     button.grid(row=2,column=0,columnspan=2,pady=10)
+
+    interval=entry.get()
+    hm=ti.get()
+    interval=int(interval)
+    if hm=="HOURS":
+        interval=interval*60
+    global rrr,sss,ddd
+    export.output_to_file(rrr,ddd,sss,interval)
+
     
     ibox.mainloop()  
 
@@ -224,7 +233,6 @@ def recorder(num = 1):
         #app.after(173, lambda:sendaudio(tt,date,time,rr,ss,dd,num))
 
 
-global rrr,sss,ddd
 
 def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
 
@@ -236,8 +244,9 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     cursor.execute(sql)
 	
     outfile = open("output.text","w") 													#ismei save krenge output
-   	
-    outstring1 = "1 "+r+" "+d+" "+s
+
+    global rrr,sss,ddd
+    outstring1 = "1 "+rrr+" "+ddd+" "+sss
     outfile.write(outstring1+"\n")
     d1=str(d1)
     d2=str(d2)
@@ -301,8 +310,8 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
             absmintime=outtime
 
 	intt = int(interval)		
-	#if int(num)%int(interval)==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
-        if (int(num)%1)==0:
+	if int(num)%intt==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
+        #if (int(num)%1)==0:
             if perdate!=outdate:
                 perdate=outdate
                 outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
@@ -333,7 +342,7 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
                 outstring = "2 "+str(outdate)+" "+outtime+" +" +str(outtemp)+" Deg C"
             else :
                 outstring = "2 "+str(outdate)+" "+outtime+" -" + str(outtemp)+" Deg C"
-        outfile.write(outstring+"\n")
+            outfile.write(outstring+"\n")
 		
         num=num+1
 															
@@ -349,6 +358,7 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
 	
     outfile.write(outstring5+"\n")	
     outfile.write(outstring6+"\n")
+    return "2"
 
 
 class AutoScrollbar(tk.Scrollbar):
@@ -1026,8 +1036,10 @@ class Output(tk.Frame):
                 global calframe
                 if calframe:
                     calframe.grid_forget()
-                output_on_screen("r","d","s",g,e,f,a,c,b,d)              
-                controller.show_frame(ViewOutput)
+                global rrr,sss,ddd, outfile
+                x=output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)              
+                if x=="2":
+                    controller.show_frame(ViewOutput)
                 # recorder()
 
 
@@ -1066,9 +1078,7 @@ class ViewOutput(tk.Frame):
         outputFrame.grid_rowconfigure(0, weight=1)
         outputFrame.grid_columnconfigure(0, weight=1)
         frame = tk.Text(canvas, state="normal",width=100)
-        file = open('output.text','r')
-        frame.insert(tk.INSERT,file.read())
-        frame.config(state="disabled")
+        
 
         canvas.create_window(0, 0, anchor="nw", window=frame)
         frame.update_idletasks()
@@ -1080,6 +1090,7 @@ class ViewOutput(tk.Frame):
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
 
         backButton.grid()
+
 
 class Login(tk.Frame):
 

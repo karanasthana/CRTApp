@@ -1,6 +1,7 @@
 import MySQLdb
 import time
 import datetime
+import usb
 
 def output_to_file(r,d,s,interval):
   
@@ -15,12 +16,13 @@ def output_to_file(r,d,s,interval):
     outstring1 = "1 "+r+" "+d+" "+s
     outfile.write(outstring1+"\n")  															#Line-1 into the file
 
-    time1=str(hh1+":"+mm1)
-    time2=str(hh2+":"+mm2)
+    #time1=str(hh1+":"+mm1)
+    #time2=str(hh2+":"+mm2)
+    intt=int(interval)
     sql = ("""SELECT * FROM TEMPERATURES1;""")		#Retrieving data from whole dbms
     cursor.execute(sql)
     result = cursor.fetchall()
-    giveresult(result,interval)
+    giveresult(result,intt)
   
 
 def giveresult(result,interval):
@@ -66,8 +68,9 @@ def giveresult(result,interval):
             absmintemp=outtemp
             absmindate=outdate
             absmintime=outtime
-			
-	if num%interval==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
+
+	intt=int(interval)		
+	if num%intt==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
             if perdate!=outdate:
                 perdate=outdate
                 outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
@@ -114,3 +117,4 @@ def giveresult(result,interval):
 	
     outfile.write(outstring5+"\n")	
     outfile.write(outstring6+"\n")
+    usb.usbexport()
