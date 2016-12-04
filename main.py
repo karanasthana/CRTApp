@@ -5,15 +5,15 @@ import re
 import tkMessageBox
 import subprocess
 import os
-# import MySQLdb
+import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-# import toaudio
-# import dbms
-# import usb
-# import temperature
-# import export
+import toaudio
+import dbms
+import usb
+import temperature
+import export
 
 # import glob
 # import shutil
@@ -110,6 +110,7 @@ ENTRYFRAMEPADY = 40
 BUTTONFRAMEPADX = 310
 calframe = None
 PASSWORD = "crt"
+nn=0
 
 
 def inputBox():
@@ -188,12 +189,13 @@ def recorder(num = 1):
     if num:
         tt=temperature.read_temp()
         global secondGap
-        today = str(datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
-        todaytime = str(today[11:19])
-        today= str(today[:10])
-        global mx,mn
+        today = (datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
+        today1=str(today)
+        todaytime = str(today1[11:19])
+        today1= str(today1[:10])
+        global mx,mn,nn
         mx,mn=update_maxmin(tt)
-        prev_date=today
+        prev_date=today1
         prev_time=todaytime
         if float(tt)==85.0:
             t1.configure(text = "--")
@@ -204,7 +206,19 @@ def recorder(num = 1):
         t3.configure(text = mn)
         date.configure(text = prev_date)
         time.configure(text=prev_time)
-        dbms.todbms(tt,prev_date,prev_time,num)
+        global c,d,f,labelr,nn
+        curr = str(f+" "+c+":"+d+":00")
+        starttime=datetime.datetime.strptime(curr,"%d-%m-%Y %H:%M:%S")
+        if today>=starttime:
+            if nn != 2:
+                nn=1
+            dbms.todbms(tt,prev_date,prev_time,num)
+            print "start"
+        if nn==1:
+            nn=2
+            print "done"
+            labelr.configure(text="RECORDING")
+            
         app.after(173, lambda:recorder(num+1))
         # app.after(173, lambda:todbms(tt,prev_date,prev_time,num))
         #app.after(173, lambda:sendaudio(tt,date,time,rr,ss,dd,num))
@@ -392,7 +406,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Menu)
+        self.show_frame(Login)
 
     def show_frame(self, cont):
 
@@ -632,6 +646,7 @@ class DateTimeSetting(tk.Frame):
 
     def start_recording(self,controller,hh1,mm1,hh2,mm2,cdate,sdate):
 
+        global c,d,f
     	a = hh1.get()
     	b = mm1.get()
     	c = hh2.get()
@@ -723,10 +738,11 @@ class MainScreen(tk.Frame):
         div.grid(row=1, column = 1,pady=20)
         ssss.grid(row=1, column = 2,pady=20)
 
+        global labelr
         recording = tk.Frame(display)
         # photo = tk.PhotoImage(file = "/home/anupam/WorkSpace/CRTApp/img/rec.gif")
-        label = tk.Label(recording,text="RECORDING",font = controller.defaultFont,fg="red")
-        label.pack()
+        labelr = tk.Label(recording,text="",font = controller.defaultFont,fg="red")
+        labelr.pack()
         recording.pack()
 
         grid2 = tk.Frame(display)
