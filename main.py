@@ -5,15 +5,15 @@ import re
 import tkMessageBox
 import subprocess
 import os
-import MySQLdb
+# import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-import toaudio
-import dbms
-import usb
-import temperature
-import export
+# import toaudio
+# import dbms
+# import usb
+# import temperature
+# import export
 
 # import glob
 # import shutil
@@ -416,7 +416,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Login)
+        self.show_frame(ViewOutput)
 
     def show_frame(self, cont):
 
@@ -1036,10 +1036,15 @@ class Output(tk.Frame):
                 global calframe
                 if calframe:
                     calframe.grid_forget()
-                global rrr,sss,ddd, outfile
-                x=output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)              
-                if x=="2":
-                    controller.show_frame(ViewOutput)
+                global rrr,sss,ddd, outfile,out
+                output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)
+                num_lines = sum(1 for line in open('output.text'))
+                out.config(height=num_lines)
+                file = open('output.text','r')
+                out.insert(tk.INSERT,file.read())
+                file.close()
+                out.config(state="disabled")              
+                controller.show_frame(ViewOutput)
                 # recorder()
 
 
@@ -1064,27 +1069,38 @@ class ViewOutput(tk.Frame):
         buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
 
         outputFrame = tk.Frame(self)
-        outputFrame.grid(row=0,column=0,sticky="nsew")
-        # outputFrame.grid_rowconfigure(0, weight=1)
-        # outputFrame.grid_columnconfigure(0, weight=1)
         vscrollbar = AutoScrollbar(outputFrame)
         vscrollbar.grid(row=0, column=1, sticky="ns")
-        # hscrollbar = AutoScrollbar(outputFrame, orient="horizontal")
-        # hscrollbar.grid(row=1, column=0, sticky="ew")
-        canvas = tk.Canvas(outputFrame, yscrollcommand=vscrollbar.set)#, xscrollcommand=hscrollbar.set)
+        hscrollbar = AutoScrollbar(outputFrame, orient="horizontal")
+        hscrollbar.grid(row=1, column=0, sticky="ew")
+        canvas = tk.Canvas(outputFrame, yscrollcommand=vscrollbar.set, xscrollcommand=hscrollbar.set,width=650)
         canvas.grid(row=0, column=0, sticky="nsew")
         vscrollbar.config(command=canvas.yview)
-        # hscrollbar.config(command=canvas.xview)
+        hscrollbar.config(command=canvas.xview)
         outputFrame.grid_rowconfigure(0, weight=1)
         outputFrame.grid_columnconfigure(0, weight=1)
-        frame = tk.Text(canvas, state="normal",width=100)
+        frame = tk.Frame(canvas)
+        frame.rowconfigure(1, weight=1)
+        frame.columnconfigure(1, weight=1)
         
-
+        # num_lines = sum(1 for line in open('output.text'))
+        # print num_lines
+        global out
+        out = tk.Text(frame, state="normal",width = 100,height = 400)
+        out.pack()
+        # text = tk.Label(frame,text=file.read(),justify = "left")
+        # for i in range(1, rows):
+        #   for j in range(1, 10):
+        #       button = tk.Button(frame, text="%d, %d" % (i,j))
+        #       button.grid(row=i, column=j, sticky='news')
+        # frame.rowconfigure(1, weight=1)
+        # frame.columnconfigure(1, weight=1)
+        # text.pack()
         canvas.create_window(0, 0, anchor="nw", window=frame)
         frame.update_idletasks()
         canvas.config(scrollregion=canvas.bbox("all"))
 
-        outputFrame.grid(row=2,column=0,pady=ENTRYFRAMEPADY,padx=35,columnspan=3)
+        outputFrame.grid(row=2,column=0,pady=ENTRYFRAMEPADY,padx=35)
 
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
