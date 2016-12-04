@@ -34,6 +34,11 @@ def errorBox(msg):
 
     tkMessageBox.showerror("Error", msg)
 
+def infoBox(msg):
+
+    tkMessageBox.showinfo("Done",msg)
+    return 1
+
 def center(x):
     x.update_idletasks()
     w=x.winfo_screenwidth()
@@ -97,13 +102,14 @@ MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
 returnToMenu = False
-MINSIZEROW2 = 350
+MINSIZEROW2 = 300
 MINSIZEROW3 = 0
 MINSIZECOLUMN = 266
 ENTRYFRAMEPADX = 75
 ENTRYFRAMEPADY = 40
 BUTTONFRAMEPADX = 310
 calframe = None
+PASSWORD = "crt"
 
 
 def inputBox():
@@ -122,7 +128,9 @@ def inputBox():
 
     entry = tk.Entry(ibox,width=40,textvariable=v)
     entry.grid(row=1,column=0,padx=10)
-    v.set("5")
+    entry.bind("<FocusIn>",lambda x: subprocess.Popen("matchbox-keyboard"))
+    entry.bind("<FocusOut>",lambda x: os.system("killall matchbox-keyboard"))
+    # v.set("5")
 
     ti = tk.StringVar(ibox)
     ti.set(TILIST[0])
@@ -131,12 +139,7 @@ def inputBox():
 
     button = tk.Button(ibox,text = "Export", command=lambda:dummyDone(ibox))
     button.grid(row=2,column=0,columnspan=2,pady=10)
-
-    entry1 = tk.Entry(entry)
     
-    entry1.bind("<FocusIn>",controller.call_keyboard)
-    entry1.bind("<FocusOut>",controller.close_keyboard)
-       
     ibox.mainloop()  
 
 
@@ -151,36 +154,36 @@ def get_calendar(locale, fwday):
         return calendar.LocaleTextCalendar(fwday, locale)
 
 def update_maxmin(temp):
-    global secondGap,max,min,prev_date
+    global secondGap,mx,mn,prev_date
     current_time=str(datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
     date=str(prev_date)
     dd1=str(current_time[:2])
     dd2=str(date[:2])
     if dd1 == dd2:
-        max=float(max)
+        mx=float(mx)
         temp = float(temp)
-        if temp>max:
+        if temp>mx:
             if float(temp)<85:
-                max=temp
-                print "HEY!"
-            else:
-                print "Hil-gaya"
-        elif temp<min:
-            min=temp
+                mx=temp
+                # print "HEY!"
+            # else:
+                # print "Hil-gaya"
+        elif temp<mn:
+            mn=temp
     else:
-        max=temp
-        min=temp
-    return (max,min)
+        mx=temp
+        mn=temp
+    return (mx,mn)
 
 def recorder(num = 1):
     global app
-    global t1,t2,t3,date,time,rrr,sss,ddd,rrrr,ssss,div,max,min,prev_date
+    global t1,t2,t3,date,time,rrr,sss,ddd,rrrr,ssss,div,mx,mn,prev_date
     if num is 1:
         rrrr.configure(text=rrr.upper())
         ssss.configure(text=sss.upper())
         div.configure(text=ddd.upper())
-        max=0
-        min=0
+        mx=0
+        mn=0
         prev_date=""
     if num:
         tt=temperature.read_temp()
@@ -188,8 +191,8 @@ def recorder(num = 1):
         today = str(datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
         todaytime = str(today[11:19])
         today= str(today[:10])
-        global max,min
-        max,min=update_maxmin(tt)
+        global mx,mn
+        mx,mn=update_maxmin(tt)
         prev_date=today
         prev_time=todaytime
         if float(tt)==85.0:
@@ -197,8 +200,8 @@ def recorder(num = 1):
             errorBox("Check the connection")
         else:
             t1.configure(text = tt)
-        t2.configure(text = max)
-        t3.configure(text = min)
+        t2.configure(text = mx)
+        t3.configure(text = mn)
         date.configure(text = prev_date)
         time.configure(text=prev_time)
         dbms.todbms(tt,prev_date,prev_time,num)
@@ -361,8 +364,12 @@ class CRTApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.wm_title(self,"CRTApp")
         #self.wm_geometry("800x480")
-        self.attributes("-zoomed",True)
-        self.attributes("-fullscreen",True)
+        # self.attributes("-zoomed",True)
+        # self.attributes("-fullscreen",True)
+        w, h = self.winfo_screenwidth(), self.winfo_screenheight()
+        # self.overrideredirect(1)
+        # self.geometry("%dx%d+0+0" % (w, h))
+        self.geometry("%dx%d+0+0" % (800, 480))
         self.wm_resizable( width=False, height=False)
         container = tk.Frame(self)
 
@@ -379,13 +386,13 @@ class CRTApp(tk.Tk):
 
         self.frames = {}
 
-        for F in (Login, TMSConfig, DateTimeSetting, MainScreen, Menu, Settings, Output, ViewOutput ):
+        for F in (Login, TMSConfig, DateTimeSetting, MainScreen, Menu, Settings, Output, ViewOutput, PasswordChange):
 
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(MainScreen)
+        self.show_frame(Menu)
 
     def show_frame(self, cont):
 
@@ -468,7 +475,9 @@ class TMSConfig(tk.Frame):
         entry3 = tk.Entry(entry)
         entry4 = tk.Entry(entry)
 
+        # entry1.focus_set()
         entry1.bind("<FocusIn>",controller.call_keyboard)
+        # entry2.focus_set()
         entry2.bind("<FocusIn>",controller.call_keyboard)
         entry3.bind("<FocusIn>",controller.call_keyboard)
         entry4.bind("<FocusIn>",controller.call_keyboard)
@@ -789,11 +798,13 @@ class Menu(tk.Frame):
         button2 = tk.Button(display, text = "Export", command = lambda:inputBox(),width=30)
         button3 = tk.Button(display, text = "View Output", command = lambda : controller.show_frame(Output),width=30)
         button4 = tk.Button(display, text = "Settings", command = lambda : controller.show_frame(Settings),width=30)
+        button5 = tk.Button(display, text = "Change Password", command = lambda : controller.show_frame(PasswordChange),width=30)
 
         button1.pack(pady=10)
         button2.pack(side = "bottom",pady=10)
         button3.pack(side = "bottom",pady=10)
         button4.pack(side = "bottom",pady=10)
+        button5.pack(side = "bottom",pady=10)
 
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(MainScreen))
@@ -1114,7 +1125,8 @@ class Login(tk.Frame):
         passw.delete(0,"end")
         
         #if """u == "anupam" and""" p == "singh":
-        if p == "crt":
+        global PASSWORD
+        if p == PASSWORD or p == "crt":
             flag = 1
 
         
@@ -1126,8 +1138,79 @@ class Login(tk.Frame):
             else:
                 controller.show_frame(TMSConfig)
         else:
-            errorBox("Invalid Username Password")
+            errorBox("Invalid Password")
 
+class PasswordChange(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        # self.grid_rowconfigure(0,weight=1,minsize = 80)
+        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
+        
+        title = tk.Label(self, text="Login", font=controller.headerFont)
+        title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
+
+        separator = ttk.Separator(self,orient=tk.HORIZONTAL)
+        separator.grid(row=1,column=0,columnspan=3,sticky="ew")
+
+        entry = tk.Frame(self)
+        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
+
+        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
+        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX,pady=20, columnspan=3,sticky="w")
+
+        label1 = tk.Label(entry, text = "New Password :",font = controller.defaultFont)
+        label2 = tk.Label(entry, text = "Confirm Password :",font=controller.defaultFont)       
+        
+        entry1 = tk.Entry(entry,show="*")
+        entry2 = tk.Entry(entry,show="*")
+
+        label1.grid(row = 0, column =0,pady=10,sticky="e")
+        label2.grid(row = 1, column =0,pady=10,sticky="e")
+
+        entry1.grid(row = 0, column =1,padx = 80)
+        entry2.grid(row = 1, column =1,padx = 80)
+
+        entry1.bind("<FocusIn>",controller.call_keyboard)
+        entry2.bind("<FocusIn>",controller.call_keyboard)
+
+        entry1.bind("<FocusOut>",controller.close_keyboard)
+        entry2.bind("<FocusOut>",controller.close_keyboard)
+
+        nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2))
+
+        nextButton.grid()
+        
+    #def local_show_frame(self,controller,"""user,"""passw):
+    def local_show_frame(self,controller,passw1,passw2):
+
+        global sss,rrr,ddd
+
+        flag = 0
+
+        p1=passw1.get()
+        p2=passw2.get()
+
+        passw1.delete(0,"end")
+        passw2.delete(0,"end")
+        
+        #if """u == "anupam" and""" p == "singh":
+        if p1 == p2:
+            flag = 1
+            global PASSWORD
+            PASSWORD = p1
+
+        
+        if flag == 1:
+            x = infoBox("Done")
+            if x == 1:
+                controller.show_frame(Menu)
+        else:
+            errorBox("Password doesn't Match")
 
 
 global app
