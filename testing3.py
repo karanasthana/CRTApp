@@ -13,10 +13,10 @@ import usb
 import temperature
 import export
 
-# import os
+import os
 # import glob
 # import shutil
-# import MySQLdb
+import MySQLdb
 # import pyaudio
 # import binascii
 
