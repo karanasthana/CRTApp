@@ -84,8 +84,8 @@ db = MySQLdb.connect("localhost","root","password","CRT1")
 cursor = db.cursor()
 
 def todbms(tt,date,time,num):
-    if num%1==0 :
-    #if num%60==0 :
+    #if num%1==0 :
+    if num%60==0 :
         today = str(date)
         yy=str(today[:4])
         mm=str(today[5:7])
@@ -262,15 +262,16 @@ def recorder(num = 1):
 def usbexport():
     source = os.listdir("/home/pi/Downloads/yellow/")
     destination = "/media/pi/TANVI/"
+    #CHANGE NAME OF TANVI TO CRT AND THE PENDRIVE BEING CONNECTED SHOULD BE NAMED CRT
     for files in source:
-        if files.endswith(".text"):
+        if files.endswith("put.text"):
             shutil.move(files,destination)
 
 
 
 returnToMenu = False
 
-MINSIZEROW2 = 180
+MINSIZEROW2 = 350
 MINSIZEROW3 = 0
 MINSIZECOLUMN = 266
 ENTRYFRAMEPADX = 75
@@ -288,6 +289,7 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
 
     db = MySQLdb.connect("localhost","root","password") 							#connect the database
     cursor = db.cursor()
+    print (str(d1))
   
     sql= """USE CRT1;"""
     cursor.execute(sql)
@@ -295,14 +297,24 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     outfile = open("output.text","w") 													#ismei save krenge output
    	
     outstring1 = "1 "+r+" "+d+" "+s
-    outfile.write(outstring1+"\n")  															#Line-1 into the file
+    outfile.write(outstring1+"\n")
+    d1=str(d1)
+    d2=str(d2)
+    #time1=str(time1)
+    #time2=str(time2)
+    hh1=str(hh1)
+    hh2=str(hh2)
+    mm1=str(mm1)
+    mm2=str(mm2)
 
-    time1=str(str(hh1)+":"+str(mm1))
-    time2=str(str(hh2)+":"+str(mm2))
+    time1=str(hh1+":"+mm1)
+    time2=str(hh2+":"+mm2)
+    #sql = ("""SELECT * FROM TEMPERATURES1;""")
     sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATE = '%s' AND TIME>'%s') OR (DATE > '%s' AND DATE<'%s') OR (DATE = '%s' AND TIME<'%s');""" %(d1,time1,d1,d2,d2,time2))	
+    #sql = ("""SELECT * FROM TEMPERATURES1 WHERE (TIME>'%s');""" %(time1))
     cursor.execute(sql)
     result = cursor.fetchall()
-    print result
+    #print result
     print "33"
     #giveresult(result,interval)
     num=0																				#To deal with the timeinterval(in minutes)	
@@ -346,8 +358,10 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
             absmintemp=outtemp
             absmindate=outdate
             absmintime=outtime
-			
-	if num%interval==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
+
+	intt = int(interval)		
+	#if int(num)%int(interval)==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
+        if (int(num)%1)==0:
             if perdate!=outdate:
                 perdate=outdate
                 outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
@@ -382,18 +396,18 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
 		
         num=num+1
 															
-	outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
-	outfile.write(outstring4+"\n")														#Writing Line-3 and Line-4
+    outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
+    outfile.write(outstring4+"\n")														#Writing Line-3 and Line-4
         
-	outstring5 = "5 "+str(absmaxdate)+" "+str(absmaxtime)+" +" + str(absmaxtemp)+" Deg C AB MAX"		#Writing Absolute minimum and maximum ONCE
+    outstring5 = "5 "+str(absmaxdate)+" "+str(absmaxtime)+" +" + str(absmaxtemp)+" Deg C AB MAX"		#Writing Absolute minimum and maximum ONCE
 	
-	if(absmintemp<0):
-		outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" -" + str(absmintemp)+" Deg C AB MIN"	
-	else:
-		outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" +" + str(absmintemp)+" Deg C AB MIN"
+    if(absmintemp<0):
+        outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" -" + str(absmintemp)+" Deg C AB MIN"	
+    else:
+        outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" +" + str(absmintemp)+" Deg C AB MIN"
 	
-	outfile.write(outstring5+"\n")	
-	outfile.write(outstring6+"\n")
+    outfile.write(outstring5+"\n")	
+    outfile.write(outstring6+"\n")
 
 
 
@@ -499,18 +513,18 @@ def giveresult(result,interval):
 		
         num=num+1
 															
-	outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
-	outfile.write(outstring4+"\n")														#Writing Line-3 and Line-4
+    outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
+    outfile.write(outstring4+"\n")														#Writing Line-3 and Line-4
         
-	outstring5 = "5 "+str(absmaxdate)+" "+str(absmaxtime)+" +" + str(absmaxtemp)+" Deg C AB MAX"		#Writing Absolute minimum and maximum ONCE
+    outstring5 = "5 "+str(absmaxdate)+" "+str(absmaxtime)+" +" + str(absmaxtemp)+" Deg C AB MAX"		#Writing Absolute minimum and maximum ONCE
 	
-	if(absmintemp<0):
-		outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" -" + str(absmintemp)+" Deg C AB MIN"	
-	else:
-		outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" +" + str(absmintemp)+" Deg C AB MIN"
+    if(absmintemp<0):
+        outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" -" + str(absmintemp)+" Deg C AB MIN"	
+    else:
+        outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" +" + str(absmintemp)+" Deg C AB MIN"
 	
-	outfile.write(outstring5+"\n")	
-	outfile.write(outstring6+"\n")
+    outfile.write(outstring5+"\n")	
+    outfile.write(outstring6+"\n")
 
 
 
@@ -540,7 +554,9 @@ class CRTApp(tk.Tk):
         
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.wm_title(self,"CRTApp")
-        self.wm_geometry("800x480")
+        #self.wm_geometry("800x480")
+        self.attributes("-zoomed",True)
+        self.attributes("-fullscreen",True)
         self.wm_resizable( width=False, height=False)
         container = tk.Frame(self)
 
@@ -1171,7 +1187,7 @@ class Output(tk.Frame):
                 global calframe
                 if calframe:
                     calframe.grid_forget()
-                output_on_screen("r","d","s",intr,sdate,edate,hh1,hh2,mm1,mm2)              
+                output_on_screen("r","d","s",g,e,f,a,c,b,d)              
                 controller.show_frame(ViewOutput)
                 # recorder()
 
@@ -1211,7 +1227,7 @@ class ViewOutput(tk.Frame):
         outputFrame.grid_rowconfigure(0, weight=1)
         outputFrame.grid_columnconfigure(0, weight=1)
         frame = tk.Text(canvas, state="normal",width=100)
-        file = open('testing.txt','r')
+        file = open('output.text','r')
         frame.insert(tk.INSERT,file.read())
         frame.config(state="disabled")
 
@@ -1247,7 +1263,7 @@ class Login(tk.Frame):
         entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
+        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX,pady=20, columnspan=3,sticky="w")
 
         #label1 = tk.Label(entry, text = "Username :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "Password :",font=controller.defaultFont)       
