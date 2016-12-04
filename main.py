@@ -4,19 +4,19 @@ import datetime
 import re
 import tkMessageBox
 import subprocess
+import os
+# import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-import toaudio
-import dbms
-import usb
-import temperature
-import export
+# import toaudio
+# import dbms
+# import usb
+# import temperature
+# import export
 
-import os
 # import glob
 # import shutil
-import MySQLdb
 # import pyaudio
 # import binascii
 
@@ -385,7 +385,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Login)
+        self.show_frame(MainScreen)
 
     def show_frame(self, cont):
 
@@ -713,6 +713,12 @@ class MainScreen(tk.Frame):
         rrrr.grid(row=1, column = 0,pady=20)
         div.grid(row=1, column = 1,pady=20)
         ssss.grid(row=1, column = 2,pady=20)
+
+        recording = tk.Frame(display)
+        # photo = tk.PhotoImage(file = "/home/anupam/WorkSpace/CRTApp/img/rec.gif")
+        label = tk.Label(recording,text="RECORDING",font = controller.defaultFont,fg="red")
+        label.pack()
+        recording.pack()
 
         grid2 = tk.Frame(display)
         grid2.pack(pady=40)
