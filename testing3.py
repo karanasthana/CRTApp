@@ -1,16 +1,24 @@
 import calendar
-import pcalender
 import time
 import datetime
 import re
 import tkMessageBox
-import os
-import glob
 import subprocess
-import shutil
-import MySQLdb
-import pyaudio
-import binascii
+
+# USER DEFINED 
+import pcalendar
+import toaudio
+import dbms
+import usb
+import temperature
+import export
+
+# import os
+# import glob
+# import shutil
+# import MySQLdb
+# import pyaudio
+# import binascii
 
 try:
     import Tkinter as tk
@@ -24,7 +32,7 @@ except ImportError:
 
 def errorBox(msg):
 
-	tkMessageBox.showerror("Error", msg)
+    tkMessageBox.showerror("Error", msg)
 
 def center(x):
     x.update_idletasks()
@@ -79,50 +87,23 @@ def dummyDone(x):
     # dummyDone()
 
 TILIST = ["Minutes","Hours"]
+HHLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
+            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
+MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
+            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+            "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
+            "31", "32", "33", "34", "35", "36", "37", "38", "39", "40",
+            "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
+            "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
-db = MySQLdb.connect("localhost","root","password","CRT1")
-cursor = db.cursor()
-
-def todbms(tt,date,time,num):
-    #if num%1==0 :
-    if num%60==0 :
-        today = str(date)
-        yy=str(today[:4])
-        mm=str(today[5:7])
-        dd=str(today[8:10])
-        stringdate = dd+"/"+mm+"/"+yy
-        stringtime = str(time[:5])
-        temper=str(tt)
-        sql = ("""INSERT INTO TEMPERATURES1 VALUES ('%s','%s','%s');""" %(stringdate,stringtime,temper))
-        cursor.execute(sql)
-        db.commit()    
-
-def sendAudio(t,date,time,r,d,s,num):
-    if num%60==0:
-        try:
-            if(t>=0):
-                a="1 RRRR + SSSS + DDDD" + "\n" + "2" + date+" +"+time+" +"+t+" Deg C"
-            else:
-                a="1 RRRR + SSSS + DDDD" + "\n" + "2" + date+" +"+time+" -"+t+" Deg C"
-            b = bin(int(binascii.hexlify(c),16))
-
-            sample_stream=[]
-            high_note = (b'\xFF'*100 + b'\0'*100)*50
-            low_note = (b'\xFF'*50 + b'\0'*50)*100
-
-            for bit in b[2:] :
-                if bit == '1':
-                    sample_stream.extend(high_note)
-                else:
-                    sample_stream.extend(low_note)
-
-            sample_buffer = b''.join(sample_stream)
-
-            p = pyaudio.PyAudio()
-            stream = p.open(format = p.get_format_from_width(4),channels=1,rate=44100,output=True)
-            #stream.write(sample_buffer)   """ ISKO CHALAANE PE INFINITE LOOP AARA HAI AND KUCH HO NHI RAHA!! """
-        except:
-            pass
+returnToMenu = False
+MINSIZEROW2 = 350
+MINSIZEROW3 = 0
+MINSIZECOLUMN = 266
+ENTRYFRAMEPADX = 75
+ENTRYFRAMEPADY = 40
+BUTTONFRAMEPADX = 310
+calframe = None
 
 
 def inputBox():
@@ -156,43 +137,8 @@ def inputBox():
     entry1.bind("<FocusIn>",controller.call_keyboard)
     entry1.bind("<FocusOut>",controller.close_keyboard)
        
-    ibox.mainloop()
+    ibox.mainloop()  
 
-
-os.system('modprobe w1-gpio')
-os.system('modprobe w1-therm')
-
-base_dir='/sys/bus/w1/devices/'
-device_folder = glob.glob(base_dir + '28-000001db066d')[0]
-device_file = device_folder+'/w1_slave'
-
-def read_temp_raw():
-    f=open(device_file,'r')
-    lines=f.readlines()
-    f.close()
-    return lines
-
-def read_temp():
-    lines=read_temp_raw()
-    while lines[0].strip()[-3:]!='YES' :
-        lines=read_temp_raw()
-    equals_pos = lines[1].find('t=')
-    if equals_pos != -1:
-        temp_string = lines[1][equals_pos+2:]
-        temp_c = ("%.1f" % (float(temp_string)/1000.0))
-        return temp_c    
-
-
-
-
-HHLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
-            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
-MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
-            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
-            "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
-            "31", "32", "33", "34", "35", "36", "37", "38", "39", "40",
-            "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
-            "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
 def qf():
     print ("done")
@@ -237,7 +183,7 @@ def recorder(num = 1):
         min=0
         prev_date=""
     if num:
-        tt=read_temp()
+        tt=temperature.read_temp()
         global secondGap
         today = str(datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
         todaytime = str(today[11:19])
@@ -255,35 +201,13 @@ def recorder(num = 1):
         t3.configure(text = min)
         date.configure(text = prev_date)
         time.configure(text=prev_time)
+        dbms.todbms(tt,prev_date,prev_time,num)
         app.after(173, lambda:recorder(num+1))
-        app.after(173, lambda:todbms(tt,prev_date,prev_time,num))
+        # app.after(173, lambda:todbms(tt,prev_date,prev_time,num))
         #app.after(173, lambda:sendaudio(tt,date,time,rr,ss,dd,num))
 
-def usbexport():
-    source = os.listdir("/home/pi/Downloads/yellow/")
-    destination = "/media/pi/TANVI/"
-    #CHANGE NAME OF TANVI TO CRT AND THE PENDRIVE BEING CONNECTED SHOULD BE NAMED CRT
-    for files in source:
-        if files.endswith("put.text"):
-            shutil.move(files,destination)
-
-
-
-returnToMenu = False
-
-MINSIZEROW2 = 350
-MINSIZEROW3 = 0
-MINSIZECOLUMN = 266
-ENTRYFRAMEPADX = 75
-ENTRYFRAMEPADY = 40
-BUTTONFRAMEPADX = 310
-calframe = None
 
 global rrr,sss,ddd
-
-
-import MySQLdb
-import datetime
 
 def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
 
@@ -410,124 +334,6 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     outfile.write(outstring6+"\n")
 
 
-
-
-
-def output_to_file(r,d,s,interval):
-  
-    db = MySQLdb.connect("localhost","root","password") 							#connect the database
-    cursor = db.cursor()
-  
-    sql= """USE CRT1;"""
-    cursor.execute(sql)
-	
-    outfile = open("testing.text","w") 													#ismei save krenge output || name can preferably be the date!
-   	
-    outstring1 = "1 "+r+" "+d+" "+s
-    outfile.write(outstring1+"\n")  															#Line-1 into the file
-
-    time1=str(hh1+":"+mm1)
-    time2=str(hh2+":"+mm2)
-    sql = ("""SELECT * FROM TEMPERATURES1;""")		#Retrieving data from whole dbms
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    giveresult(result,interval)
-  
-
-def giveresult(result,interval):
-  
-    num=0																				#To deal with the timeinterval(in minutes)	
-    maxtemp = result[0][2]
-    mintemp = result[0][2]
-	
-    absmaxtemp = result[0][2]
-    absmintemp = result[0][2]
-	
-    x=result[0][0]
-    y=result[0][1]
-	
-    mindate =x																				#min ki date
-    maxdate	=x																			
-	
-    absmaxdate =x																		#absolute max ki date
-    absmindate =x
-	
-    mintime=y			
-    maxtime=y
-	
-    absmaxtime=y
-    absmintime=y
-	
-    perdate=x
-    
-    outstring3="3 " +str(maxdate)+" "+str(maxtime)+" +" + str(maxtemp)+" Deg C HR MAX"
-    outstring4="4 " +str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"
-	
-    for row in result:
-        outdate = row[0]
-	outtime = row[1]
-	outtemp = row[2]
-	temptemp=outtemp
-	if outtemp>=absmaxtemp:															#changing absolute maximum and minimum(which will be per minute)
-            absmaxtemp=outtemp
-            absmaxdate=outdate
-            absmaxtime=outtime
-		                
-	if absmintemp>=outtemp:
-            absmintemp=outtemp
-            absmindate=outdate
-            absmintime=outtime
-			
-	if num%interval==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
-            if perdate!=outdate:
-                perdate=outdate
-                outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
-                outfile.write(outstring4+"\n")														#Writing Line-3 and Line-4
-                mintemp=outtemp
-                maxtemp=outtemp
-                mindate=outdate
-                maxdate=outdate
-                mintime=outtime
-                maxtime=outtime
-                                
-            if mintemp>=outtemp:
-                mintemp=outtemp
-                mindate=outdate
-                mintime=outtime
-                if(mintemp<0):
-                    outstring4 = "4 "+str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"	
-                else:
-                    outstring4 = "4 "+str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"
-                
-            if outtemp>=maxtemp:															
-                maxtemp=outtemp
-                maxdate=outdate
-                maxtime=outtime
-                outstring3 = "3 " +str(maxdate)+" "+str(maxtime)+" +" + str(maxtemp)+" Deg C HR MAX"						#hourly max temperature per day
-			
-            if outtemp>=0 : 																#Line 2 of the output file
-                outstring = "2 "+str(outdate)+" "+outtime+" +" +str(outtemp)+" Deg C"
-            else :
-                outstring = "2 "+str(outdate)+" "+outtime+" -" + str(outtemp)+" Deg C"
-        outfile.write(outstring+"\n")
-		
-        num=num+1
-															
-    outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
-    outfile.write(outstring4+"\n")														#Writing Line-3 and Line-4
-        
-    outstring5 = "5 "+str(absmaxdate)+" "+str(absmaxtime)+" +" + str(absmaxtemp)+" Deg C AB MAX"		#Writing Absolute minimum and maximum ONCE
-	
-    if(absmintemp<0):
-        outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" -" + str(absmintemp)+" Deg C AB MIN"	
-    else:
-        outstring6 = "6 "+str(absmindate)+" "+str(absmintime)+" +" + str(absmintemp)+" Deg C AB MIN"
-	
-    outfile.write(outstring5+"\n")	
-    outfile.write(outstring6+"\n")
-
-
-
 class AutoScrollbar(tk.Scrollbar):
     # A scrollbar that hides itself if it's not needed.
     # Only works if you use the grid geometry manager!
@@ -606,7 +412,7 @@ class CRTApp(tk.Tk):
 
         global calframe
         calframe = ttk.Frame(container,borderwidth=3,relief=tk.GROOVE)
-        ttkcal = pcalender.Calendar(calframe,self.update,e,firstweekday=pcalender.calendar.SUNDAY)
+        ttkcal = pcalendar.Calendar(calframe,self.update,e,firstweekday=pcalendar.calendar.SUNDAY)
         ttkcal.grid(row=0,column=0)
 
         # close = ttk.Button(calframe,text='x',width=1,command=lambda:qf())#self.update(calframe,e,ttkcal))
