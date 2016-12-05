@@ -5,17 +5,17 @@ import re
 import tkMessageBox
 import subprocess
 import os
-from itertools import islice
-# import MySQLdb
+#from itertools import islice
+import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-# import toaudio
-# import dbms
-# import usb
-# import temperature
-# import export
-# import buzzer
+import toaudio
+import dbms
+import usb
+import temperature
+import export
+import buzzer
 
 # import glob
 # import shutil
@@ -282,6 +282,7 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     time1=str(hh1+":"+mm1)
     time2=str(hh2+":"+mm2)
     #sql = ("""SELECT * FROM TEMPERATURES1;""")
+    #sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATE = '%s' AND TIME='%s')
     sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATE = '%s' AND TIME>'%s') OR (DATE > '%s' AND DATE<'%s') OR (DATE = '%s' AND TIME<'%s');""" %(d1,time1,d1,d2,d2,time2))	
     #sql = ("""SELECT * FROM TEMPERATURES1 WHERE (TIME>'%s');""" %(time1))
     cursor.execute(sql)
@@ -440,7 +441,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Output)
+        self.show_frame(Login)
 
     def show_frame(self, cont):
 
@@ -1098,13 +1099,16 @@ class Output(tk.Frame):
                 if calframe:
                     calframe.grid_forget()
                 global rrr,sss,ddd, outfile,out
-                # output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)
+                output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)
                 # num_lines = sum(1 for line in open('output.text'))
                 # out.config(height=num_lines+100)
                 # file = open('output.text','r')
                 # file.close()
                 controller.read_file_helper()
+                controller.it = -1
                 a = controller.read_file(1)
+                out.config(state="normal")
+                out.delete('1.0',"end")
                 for x in a:
                     out.insert(tk.INSERT,x)
                 out.config(state="disabled")
