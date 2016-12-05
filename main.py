@@ -5,16 +5,17 @@ import re
 import tkMessageBox
 import subprocess
 import os
-import MySQLdb
+from itertools import islice
+# import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-import toaudio
-import dbms
-import usb
-import temperature
-import export
-import buzzer
+# import toaudio
+# import dbms
+# import usb
+# import temperature
+# import export
+# import buzzer
 
 # import glob
 # import shutil
@@ -112,6 +113,9 @@ BUTTONFRAMEPADX = 310
 calframe = None
 PASSWORD = "crt"
 nn=0
+rrr = "RRRR"
+sss = "RRRR"
+ddd = "RRRR"
 
 
 def inputBox():
@@ -401,6 +405,7 @@ class CRTApp(tk.Tk):
     MM = ""
     YYYY = ""
 
+
     def __init__(self, *args, **kwargs):
         
         tk.Tk.__init__(self, *args, **kwargs)
@@ -413,6 +418,7 @@ class CRTApp(tk.Tk):
         # self.geometry("%dx%d+0+0" % (w, h))
         self.geometry("%dx%d+0+0" % (800, 480))
         self.wm_resizable( width=False, height=False)
+        self.it=-1
         container = tk.Frame(self)
 
         container.pack(side="top", fill="both", expand="true")
@@ -434,7 +440,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Login)
+        self.show_frame(Output)
 
     def show_frame(self, cont):
 
@@ -481,6 +487,43 @@ class CRTApp(tk.Tk):
 
     def close_keyboard(self,event):
         os.system("killall matchbox-keyboard")
+
+    def read_file_helper(self):
+
+        self.line_offset = []
+        offset = 0
+        x = 0
+        file = open('output.text','r')
+        for line in file:
+            if(x == 0):
+                self.line_offset.append(offset)
+            offset += len(line)
+            x = (x+1)%25
+        file.close()
+        # file.seek(0)
+
+    def read_file(self,direction):
+        infile = open('output.text', 'r')
+        if direction == 0:
+            self.it = self.it - 1
+        if direction == 1:
+            self.it=self.it +1
+        if self.it<0:
+            return -1
+        if self.it==len(self.line_offset):
+            return -1
+        infile.seek(self.line_offset[self.it])
+        # print self.it
+        lines = []
+        for line in infile:
+            lines.append(line)
+            if len(lines) > 25:
+                # print lines
+                return lines
+                # lines = []
+        if len(lines) > 0:
+            # print lines
+            return lines
         
 
 
@@ -1055,13 +1098,17 @@ class Output(tk.Frame):
                 if calframe:
                     calframe.grid_forget()
                 global rrr,sss,ddd, outfile,out
-                output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)
-                num_lines = sum(1 for line in open('output.text'))
-                out.config(height=num_lines+100)
-                file = open('output.text','r')
-                out.insert(tk.INSERT,file.read())
-                file.close()
-                out.config(state="disabled")              
+                # output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)
+                # num_lines = sum(1 for line in open('output.text'))
+                # out.config(height=num_lines+100)
+                # file = open('output.text','r')
+                # file.close()
+                controller.read_file_helper()
+                a = controller.read_file(1)
+                for x in a:
+                    out.insert(tk.INSERT,x)
+                out.config(state="disabled")
+                              
                 controller.show_frame(ViewOutput)
                 # recorder()
 
@@ -1084,27 +1131,27 @@ class ViewOutput(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
+        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-50,sticky="w")
 
         outputFrame = tk.Frame(self)
-        vscrollbar = AutoScrollbar(outputFrame)
-        vscrollbar.grid(row=0, column=1, sticky="ns")
-        hscrollbar = AutoScrollbar(outputFrame, orient="horizontal")
-        hscrollbar.grid(row=1, column=0, sticky="ew")
-        canvas = tk.Canvas(outputFrame, yscrollcommand=vscrollbar.set, xscrollcommand=hscrollbar.set,width=650)
-        canvas.grid(row=0, column=0, sticky="nsew")
-        vscrollbar.config(command=canvas.yview)
-        hscrollbar.config(command=canvas.xview)
-        outputFrame.grid_rowconfigure(0, weight=1)
-        outputFrame.grid_columnconfigure(0, weight=1)
-        frame = tk.Frame(canvas)
-        frame.rowconfigure(1, weight=1)
-        frame.columnconfigure(1, weight=1)
+        # vscrollbar = AutoScrollbar(outputFrame)
+        # vscrollbar.grid(row=0, column=1, sticky="ns")
+        # hscrollbar = AutoScrollbar(outputFrame, orient="horizontal")
+        # hscrollbar.grid(row=1, column=0, sticky="ew")
+        # canvas = tk.Canvas(outputFrame, yscrollcommand=vscrollbar.set, xscrollcommand=hscrollbar.set,width=650)
+        # canvas.grid(row=0, column=0, sticky="nsew")
+        # vscrollbar.config(command=canvas.yview)
+        # hscrollbar.config(command=canvas.xview)
+        # outputFrame.grid_rowconfigure(0, weight=1)
+        # outputFrame.grid_columnconfigure(0, weight=1)
+        # frame = tk.Frame(canvas)
+        # frame.rowconfigure(1, weight=1)
+        # frame.columnconfigure(1, weight=1)
         
         # num_lines = sum(1 for line in open('output.text'))
         # print num_lines
         global out
-        out = tk.Text(frame, state="normal",width = 90,height = 0)
+        out = tk.Text(outputFrame, state="normal",width = 90,height = 25)
         out.pack()
         # text = tk.Label(frame,text=file.read(),justify = "left")
         # for i in range(1, rows):
@@ -1114,16 +1161,62 @@ class ViewOutput(tk.Frame):
         # frame.rowconfigure(1, weight=1)
         # frame.columnconfigure(1, weight=1)
         # text.pack()
-        canvas.create_window(0, 0, anchor="nw", window=frame)
-        frame.update_idletasks()
-        canvas.config(scrollregion=canvas.bbox("all"))
+        # canvas.create_window(0, 0, anchor="nw", window=frame)
+        # frame.update_idletasks()
+        # canvas.config(scrollregion=canvas.bbox("all"))
 
         outputFrame.grid(row=2,column=0,pady=ENTRYFRAMEPADY,padx=35)
 
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
+        bButton = ttk.Button(buttons, text = "<", command = lambda : self.backPage(controller,out,bButton,nButton),width = 3)
+        nButton = ttk.Button(buttons, text = ">", command = lambda : self.nextPage(controller,out,bButton,nButton), width = 3)
 
-        backButton.grid()
+        bButton.grid(padx = 5,row=0,column=0)
+        nButton.grid(padx=5,row=0,column=2)
+        backButton.grid(row=0,column=1)
+
+    def checkNextBack(self,controller,bButton,nButton):
+
+        x = controller.read_file(0)
+        controller.it = controller.it + 1
+        if x == -1 :
+            bButton.config(state = "disabled")
+        # else:
+        #     bButton.config(state = "normal")
+        x = controller.read_file(1)
+        controller.it = controller.it - 1
+        if x == -1 :
+            nButton.config(state = "disabled")
+        # else:
+        #     bButton.config(state = "normal")
+
+
+    def nextPage(self,controller,out,bButton,nButton):
+
+        a = controller.read_file(1)
+        bButton.config(state = "normal")
+        nButton.config(state = "normal")
+        self.checkNextBack(controller,bButton,nButton)
+        out.config(state="normal")
+        out.delete('1.0',"end")
+        for x in a:
+            out.insert(tk.INSERT,x)
+        out.config(state="disabled")
+
+    def backPage(self,controller,out,bButton,nButton):
+
+        a = controller.read_file(0)
+        bButton.config(state = "normal")
+        nButton.config(state = "normal")
+        self.checkNextBack(controller,bButton,nButton)
+        out.config(state="normal")
+        out.delete('1.0',"end")
+        for x in a:
+            out.insert(tk.INSERT,x)
+        out.config(state="disabled")
+
+
 
 
 class Login(tk.Frame):
