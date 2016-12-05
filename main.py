@@ -112,7 +112,13 @@ BUTTONFRAMEPADX = 310
 calframe = None
 PASSWORD = "crt"
 nn=0
-
+rrr = "RRRR"
+sss = "RRRR"
+ddd = "RRRR"
+MAXIMUM = 85.0
+MINIMUM = -5.0
+#mn=85.0
+#mx=-5.0
 
 def inputBox():
 
@@ -168,42 +174,55 @@ def get_calendar(locale, fwday):
         return calendar.LocaleTextCalendar(fwday, locale)
 
 def update_maxmin(temp):
-    global secondGap,mx,mn,prev_date
+    global secondGap,mx,mn,prev_date,MAXIMUM,MINIMUM
     current_time=str(datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
     date=str(prev_date)
     dd1=str(current_time[:2])
     dd2=str(date[:2])
+    #print MAXIMUM,MINIMUM
     if dd1 == dd2:
         mx=float(mx)
+        mn=float(mn)
+        #print mn,mx
+        #print "           "
         temp = float(temp)
+        print temp
+        MAXIMUM=float(MAXIMUM)
+        MINIMUM=float(MINIMUM)
         if temp>mx:
-            if float(temp)<85:
+            print MAXIMUM
+            if temp<MAXIMUM:
                 mx=temp
-                # print "HEY!"
-            elif float(temp)>85.0:
-                errorBox("Maximum Temperature exceeded")
-                buzzer.alarm()
-            #else:
-                # print "Hil-gaya"
-        elif temp<mn:
-            mn=temp
-            if mn<-5:
-                errorBox("Minimum Temperature exceeded")
-                buzzer.alarm()
+            elif temp>=MAXIMUM:
+                #aaa=mx
+                #mx=temp
+                print "ANDAR AA GAYA"
+                buzzer.alarmstart()
+                errorBox("MAXIMUM TEMPERATURE EXCEEDED")
+                buzzer.alarmstop()
+                #mx=aaa
+        if temp<mn:
+            if temp>=MINIMUM:
+                mn=temp
+            elif temp<MINIMUM:
+                buzzer.alarmstart()
+                errorBox("MINIMUM TEMPERATURE LIMIT")
+                buzzer.alarmstop()
     else:
         mx=temp
         mn=temp
+                 
     return (mx,mn)
 
 def recorder(num = 1):
     global app
-    global t1,t2,t3,date,time,rrr,sss,ddd,rrrr,ssss,div,mx,mn,prev_date
+    global t1,t2,t3,date,times,rrr,sss,ddd,rrrr,ssss,div,mx,mn,prev_date
     if num is 1:
         rrrr.configure(text=rrr.upper())
         ssss.configure(text=sss.upper())
         div.configure(text=ddd.upper())
-        mx=0
-        mn=0
+        mx=-5
+        mn=85
         prev_date=""
     if num:
         tt=temperature.read_temp()
@@ -212,21 +231,21 @@ def recorder(num = 1):
         today1=str(today)
         todaytime = str(today1[11:19])
         today1= str(today1[:10])
-        global mx,mn,nn
+        # global mx,mn,nn
         mx,mn=update_maxmin(tt)
         prev_date=today1
         prev_time=todaytime
         if float(tt)==85.0:
             t1.configure(text = "--")
-            buzzer.alarm()
-            #errorBox("Check the connection")
-            
+            buzzer.alarmstart()
+            errorBox("Check the connection")
+            buzzer.alarmstop()
         else:
             t1.configure(text = tt)
         t2.configure(text = mx)
         t3.configure(text = mn)
         date.configure(text = prev_date)
-        time.configure(text=prev_time)
+        times.configure(text=prev_time)
         global c,d,f,labelr,nn
         curr = str(f+" "+c+":"+d+":00")
         starttime=datetime.datetime.strptime(curr,"%d-%m-%Y %H:%M:%S")
@@ -236,12 +255,13 @@ def recorder(num = 1):
             x=0
             x=dbms.todbms(tt,prev_date,prev_time,num)
             if x==2:
-                global rrr,sss,ddd
+                # global rrr,sss,ddd
                 audio.sendaudio(tt,prev_date,prev_time,rrr,ddd,sss,num)
         if nn==1:
             nn=2
             print "done"
             labelr.configure(text="RECORDING")
+            labelr.configure(fg="red")
             
         app.after(173, lambda:recorder(num+1))
         # app.after(173, lambda:todbms(tt,prev_date,prev_time,num))
@@ -249,11 +269,11 @@ def recorder(num = 1):
 
 
 
-def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
+def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
 
     db = MySQLdb.connect("localhost","root","password") 							#connect the database
     cursor = db.cursor()
-    print (str(d1))
+    print (str(dx))
   
     sql= """USE CRT1;"""
     cursor.execute(sql)
@@ -263,19 +283,35 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     global rrr,sss,ddd
     outstring1 = "1 "+rrr+" "+ddd+" "+sss
     outfile.write(outstring1+"\n")
-    d1=str(d1)
+    dx=str(dx)
     d2=str(d2)
+    print dx
+    print d2
+    
+    
     #time1=str(time1)
     #time2=str(time2)
-    hh1=str(hh1)
+    hh12=str(hh12)
+    print hh12
     hh2=str(hh2)
     mm1=str(mm1)
+    print mm1
     mm2=str(mm2)
 
-    time1=str(hh1+":"+mm1)
-    time2=str(hh2+":"+mm2)
+    timex=hh12+":"+mm1+":00"
+    print timex
+    time2=hh2+":"+mm2+":00"
+
+    dx=dx+" "+timex
+    d2=d2+" "+time2
+
+    print dx
+    print d2
+    startepoch=int(time.mktime(time.strptime(dx,"%d-%m-%Y %H:%M:%S")))
+    endepoch=int(time.mktime(time.strptime(d2,"%d-%m-%Y %H:%M:%S")))
     #sql = ("""SELECT * FROM TEMPERATURES1;""")
-    sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATE = '%s' AND TIME>'%s') OR (DATE > '%s' AND DATE<'%s') OR (DATE = '%s' AND TIME<'%s');""" %(d1,time1,d1,d2,d2,time2))	
+    #sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATE = '%s' AND TIME='%s')
+    sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATETIME > '%s') AND (DATETIME < '%s');""" %(str(startepoch),str(endepoch)))	
     #sql = ("""SELECT * FROM TEMPERATURES1 WHERE (TIME>'%s');""" %(time1))
     cursor.execute(sql)
     result = cursor.fetchall()
@@ -283,17 +319,19 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     print "33"
     #giveresult(result,interval)
     num=0																				#To deal with the timeinterval(in minutes)	
-    maxtemp = result[0][2]
-    mintemp = result[0][2]
+    maxtemp = result[0][1]
+    mintemp = result[0][1]
 	
-    absmaxtemp = result[0][2]
-    absmintemp = result[0][2]
+    absmaxtemp = result[0][1]
+    absmintemp = result[0][1]
+
+    kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(result[0][0])))
 	
-    x=result[0][0]
-    y=result[0][1]
+    x=kk[:10]
+    y=kk[11:16]
 	
     mindate =x																				#min ki date
-    maxdate	=x																			
+    maxdate =x																			
 	
     absmaxdate =x																		#absolute max ki date
     absmindate =x
@@ -310,9 +348,10 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     outstring4="4 " +str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"
 	
     for row in result:
-        outdate = row[0]
-	outtime = row[1]
-	outtemp = row[2]
+        kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(row[0])))
+        outdate = kk[:10]
+	outtime = kk[11:16]
+	outtemp = row[1]
 	temptemp=outtemp
 	if outtemp>=absmaxtemp:															#changing absolute maximum and minimum(which will be per minute)
             absmaxtemp=outtemp
@@ -398,6 +437,7 @@ class CRTApp(tk.Tk):
     MM = ""
     YYYY = ""
 
+
     def __init__(self, *args, **kwargs):
         
         tk.Tk.__init__(self, *args, **kwargs)
@@ -410,6 +450,7 @@ class CRTApp(tk.Tk):
         # self.geometry("%dx%d+0+0" % (w, h))
         self.geometry("%dx%d+0+0" % (800, 480))
         self.wm_resizable( width=False, height=False)
+        self.it=-1
         container = tk.Frame(self)
 
         container.pack(side="top", fill="both", expand="true")
@@ -478,6 +519,58 @@ class CRTApp(tk.Tk):
 
     def close_keyboard(self,event):
         os.system("killall matchbox-keyboard")
+
+    def checkNextBack(self):
+
+        x = self.read_file(0)
+        self.it = self.it + 1
+        if x == -1 :
+            return 1
+        else:
+            return 2
+        x = self.read_file(1)
+        self.it = self.it - 1
+        if x == -1 :
+            return 3
+        else:
+            return 4
+
+    def read_file_helper(self):
+
+        self.line_offset = []
+        offset = 0
+        x = 0
+        file = open('output.text','r')
+        for line in file:
+            if(x == 0):
+                self.line_offset.append(offset)
+            offset += len(line)
+            x = (x+1)%25
+        file.close()
+        # file.seek(0)
+
+    def read_file(self,direction):
+        infile = open('output.text', 'r')
+        if direction == 0:
+            self.it = self.it - 1
+        if direction == 1:
+            self.it=self.it +1
+        if self.it<0:
+            return -1
+        if self.it==len(self.line_offset):
+            return -1
+        infile.seek(self.line_offset[self.it])
+        # print self.it
+        lines = []
+        for line in infile:
+            lines.append(line)
+            if len(lines) > 25:
+                # print lines
+                return lines
+                # lines = []
+        if len(lines) > 0:
+            # print lines
+            return lines
         
 
 
@@ -749,16 +842,16 @@ class MainScreen(tk.Frame):
         grid1.grid_columnconfigure(1,weight=1,minsize = 250)
         grid1.grid_columnconfigure(2,weight=1,minsize = 250)
 
-        global date,time,rrrr,ssss,div,t1,t2,t3
+        global date,times,rrrr,ssss,div,t1,t2,t3
 
         date = tk.Label(grid1, text = "DD/MM/YYYY",font = controller.defaultFont)
-        time = tk.Label(grid1, text = "HH/MM",font = controller.defaultFont)
+        times = tk.Label(grid1, text = "HH/MM",font = controller.defaultFont)
         rrrr = tk.Label(grid1, text = "RRRR",font = controller.defaultFont)
         div = tk.Label(grid1, text = "DIV",font = controller.defaultFont)
         ssss = tk.Label(grid1, text = "SSSS",font = controller.defaultFont)
 
         date.grid(row=0, column = 0,pady=20)
-        time.grid(row=0,column = 2,pady=20)
+        times.grid(row=0,column = 2,pady=20)
         rrrr.grid(row=1, column = 0,pady=20)
         div.grid(row=1, column = 1,pady=20)
         ssss.grid(row=1, column = 2,pady=20)
@@ -766,7 +859,7 @@ class MainScreen(tk.Frame):
         global labelr
         recording = tk.Frame(display)
         # photo = tk.PhotoImage(file = "/home/anupam/WorkSpace/CRTApp/img/rec.gif")
-        labelr = tk.Label(recording,text="",font = controller.defaultFont,fg="red")
+        labelr = tk.Label(recording,text="NOT RECORDING",font = controller.defaultFont,fg="blue")
         labelr.pack()
         recording.pack()
 
@@ -898,10 +991,26 @@ class Settings(tk.Frame):
         entry1.grid(row = 0, column =1,padx = 80)
         entry2.grid(row = 1, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Save", command = lambda : controller.show_frame(Menu))
+        nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2))
 
         nextButton.grid()
 
+    def local_show_frame(self,controller,Entry1,Entry2):
+        global MAXIMUM,MINIMUM
+        MAXIMUM=Entry1.get()
+        MINIMUM=Entry2.get()
+        checkmx = re.search("^[\-]*[0-9]+[\.]{0,1}[0-9]{0,1}$",MAXIMUM)
+        checkmn = re.search("^[\-]*[0-9]+[\.]{0,1}[0-9]{0,1}$",MINIMUM)
+        fl = 0
+        if checkmx:
+            if checkmn:
+                fl = 1
+            else:
+                errorBox("Invalid Minimum Temperature")
+        else:
+            errorBox("Invalid Maximum Temperature")
+        if fl == 1:
+            controller.show_frame(Menu)
 
 
 
@@ -1000,7 +1109,7 @@ class Output(tk.Frame):
 
     def validate(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
 
-        a = hh1.get()
+        axx = hh1.get()
         b = mm1.get()
         c = hh2.get()
         d = mm2.get()
@@ -1010,9 +1119,9 @@ class Output(tk.Frame):
         h = re.search("^[0-9]+$",g)
         # print h.group(0)
 
-        if not (a and b and c and d and e and f and h):
+        if not (axx and b and c and d and e and f and h):
             if e:
-                if a:
+                if axx:
                     if b:
                         if f:
                             if c:
@@ -1034,7 +1143,7 @@ class Output(tk.Frame):
             else:
                 errorBox("Please Enter Starting Date")
         else:
-            start_date = e + " " + a +":" + b + ":00"
+            start_date = e + " " + axx +":" + b + ":00"
             end_date = f + " " + c +":" + d + ":00"
             # print current_date,start_date
             a=str(datetime.datetime.now())
@@ -1052,13 +1161,20 @@ class Output(tk.Frame):
                 if calframe:
                     calframe.grid_forget()
                 global rrr,sss,ddd, outfile,out
-                output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)
-                num_lines = sum(1 for line in open('output.text'))
-                out.config(height=num_lines)
-                file = open('output.text','r')
-                out.insert(tk.INSERT,file.read())
-                file.close()
-                out.config(state="disabled")              
+                output_on_screen(rrr,ddd,sss,g,e,f,axx,c,b,d)
+                # num_lines = sum(1 for line in open('output.text'))
+                # out.config(height=num_lines+100)
+                # file = open('output.text','r')
+                # file.close()
+                controller.read_file_helper()
+                controller.it = -1
+                fi = controller.read_file(1)
+                out.config(state="normal")
+                out.delete('1.0',"end")
+                for x in fi:
+                    out.insert(tk.INSERT,x)
+                out.config(state="disabled")
+                              
                 controller.show_frame(ViewOutput)
                 # recorder()
 
@@ -1081,7 +1197,7 @@ class ViewOutput(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX, columnspan=3,sticky="w")
+        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-50,columnspan=3,sticky="w")
 
         outputFrame = tk.Frame(self)
         vscrollbar = AutoScrollbar(outputFrame)
@@ -1101,7 +1217,7 @@ class ViewOutput(tk.Frame):
         # num_lines = sum(1 for line in open('output.text'))
         # print num_lines
         global out
-        out = tk.Text(frame, state="normal",width = 90,height = 0)
+        out = tk.Text(frame, state="normal",width = 90,height = 25)
         out.pack()
         # text = tk.Label(frame,text=file.read(),justify = "left")
         # for i in range(1, rows):
@@ -1119,8 +1235,56 @@ class ViewOutput(tk.Frame):
 
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
+        bButton = ttk.Button(buttons, text = "<", command = lambda : self.backPage(controller,out,bButton,nButton),width = 3,state="disabled")
+        nButton = ttk.Button(buttons, text = ">", command = lambda : self.nextPage(controller,out,bButton,nButton), width = 3)
+        # self.checkNextBack(controller,bButton,nButton)
 
-        backButton.grid()
+        bButton.grid(padx = 5,row=0,column=0)
+        nButton.grid(padx=5,row=0,column=2)
+        backButton.grid(row=0,column=1)
+
+
+
+
+    def nextPage(self,controller,out,bButton,nButton):
+
+        a = controller.read_file(1)
+        if a!=-1:
+            bButton.config(state = "normal")
+            nButton.config(state = "normal")
+            ret = controller.checkNextBack()
+            if(ret == 1):
+                bButton.config(state = "disabled")
+            if(ret == 3):
+                nButton.config(state = "disabled")
+            out.config(state="normal")
+            out.delete('1.0',"end")
+            for x in a:
+                out.insert(tk.INSERT,x)
+            out.config(state="disabled")
+        else:
+            nButton.config(state="disabled")
+
+    def backPage(self,controller,out,bButton,nButton):
+
+        a = controller.read_file(0)
+        if a != -1:
+            bButton.config(state = "normal")
+            nButton.config(state = "normal")
+            ret = controller.checkNextBack()
+            if(ret == 1):
+                bButton.config(state = "disabled")
+            if(ret == 3):
+                nButton.config(state = "disabled")
+            out.config(state="normal")
+            out.delete('1.0',"end")
+            for x in a:
+                out.insert(tk.INSERT,x)
+            out.config(state="disabled")
+        else:
+            bButton.config(state="disabled")
+
+
 
 
 class Login(tk.Frame):
