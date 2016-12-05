@@ -6,16 +6,16 @@ import tkMessageBox
 import subprocess
 import os
 #from itertools import islice
-import MySQLdb
+# import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-import toaudio
-import dbms
-import usb
-import temperature
-import export
-import buzzer
+# import toaudio
+# import dbms
+# import usb
+# import temperature
+# import export
+# import buzzer
 
 # import glob
 # import shutil
@@ -219,7 +219,7 @@ def recorder(num = 1):
         today1=str(today)
         todaytime = str(today1[11:19])
         today1= str(today1[:10])
-        global mx,mn,nn
+        # global mx,mn,nn
         mx,mn=update_maxmin(tt)
         prev_date=today1
         prev_time=todaytime
@@ -243,7 +243,7 @@ def recorder(num = 1):
             x=0
             x=dbms.todbms(tt,prev_date,prev_time,num)
             if x==2:
-                global rrr,sss,ddd
+                # global rrr,sss,ddd
                 audio.sendaudio(tt,prev_date,prev_time,rrr,ddd,sss,num)
         if nn==1:
             nn=2
@@ -459,7 +459,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Login)
+        self.show_frame(Output)
 
     def show_frame(self, cont):
 
@@ -506,6 +506,21 @@ class CRTApp(tk.Tk):
 
     def close_keyboard(self,event):
         os.system("killall matchbox-keyboard")
+
+    def checkNextBack(self):
+
+        x = self.read_file(0)
+        self.it = self.it + 1
+        if x == -1 :
+            return 1
+        else:
+            return 2
+        x = self.read_file(1)
+        self.it = self.it - 1
+        if x == -1 :
+            return 3
+        else:
+            return 4
 
     def read_file_helper(self):
 
@@ -1117,7 +1132,7 @@ class Output(tk.Frame):
                 if calframe:
                     calframe.grid_forget()
                 global rrr,sss,ddd, outfile,out
-                output_on_screen(rrr,ddd,sss,g,e,f,axx,c,b,d)
+                # output_on_screen(rrr,ddd,sss,g,e,f,axx,c,b,d)
                 # num_lines = sum(1 for line in open('output.text'))
                 # out.config(height=num_lines+100)
                 # file = open('output.text','r')
@@ -1193,50 +1208,52 @@ class ViewOutput(tk.Frame):
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
         bButton = ttk.Button(buttons, text = "<", command = lambda : self.backPage(controller,out,bButton,nButton),width = 3,state="disabled")
         nButton = ttk.Button(buttons, text = ">", command = lambda : self.nextPage(controller,out,bButton,nButton), width = 3)
+        # self.checkNextBack(controller,bButton,nButton)
 
         bButton.grid(padx = 5,row=0,column=0)
         nButton.grid(padx=5,row=0,column=2)
         backButton.grid(row=0,column=1)
 
-    def checkNextBack(self,controller,bButton,nButton):
 
-        x = controller.read_file(0)
-        controller.it = controller.it + 1
-        if x == -1 :
-            bButton.config(state = "disabled")
-        # else:
-        #     bButton.config(state = "normal")
-        x = controller.read_file(1)
-        controller.it = controller.it - 1
-        if x == -1 :
-            nButton.config(state = "disabled")
-        # else:
-        #     bButton.config(state = "normal")
 
 
     def nextPage(self,controller,out,bButton,nButton):
 
         a = controller.read_file(1)
-        bButton.config(state = "normal")
-        nButton.config(state = "normal")
-        self.checkNextBack(controller,bButton,nButton)
-        out.config(state="normal")
-        out.delete('1.0',"end")
-        for x in a:
-            out.insert(tk.INSERT,x)
-        out.config(state="disabled")
+        if a!=-1:
+            bButton.config(state = "normal")
+            nButton.config(state = "normal")
+            ret = controller.checkNextBack()
+            if(ret == 1):
+                bButton.config(state = "disabled")
+            if(ret == 3):
+                nButton.config(state = "disabled")
+            out.config(state="normal")
+            out.delete('1.0',"end")
+            for x in a:
+                out.insert(tk.INSERT,x)
+            out.config(state="disabled")
+        else:
+            nButton.config(state="disabled")
 
     def backPage(self,controller,out,bButton,nButton):
 
         a = controller.read_file(0)
-        bButton.config(state = "normal")
-        nButton.config(state = "normal")
-        self.checkNextBack(controller,bButton,nButton)
-        out.config(state="normal")
-        out.delete('1.0',"end")
-        for x in a:
-            out.insert(tk.INSERT,x)
-        out.config(state="disabled")
+        if a != -1:
+            bButton.config(state = "normal")
+            nButton.config(state = "normal")
+            ret = controller.checkNextBack()
+            if(ret == 1):
+                bButton.config(state = "disabled")
+            if(ret == 3):
+                nButton.config(state = "disabled")
+            out.config(state="normal")
+            out.delete('1.0',"end")
+            for x in a:
+                out.insert(tk.INSERT,x)
+            out.config(state="disabled")
+        else:
+            bButton.config(state="disabled")
 
 
 
