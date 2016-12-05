@@ -5,15 +5,16 @@ import re
 import tkMessageBox
 import subprocess
 import os
-# import MySQLdb
+import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-# import toaudio
-# import dbms
-# import usb
-# import temperature
-# import export
+import toaudio
+import dbms
+import usb
+import temperature
+import export
+import buzzer
 
 # import glob
 # import shutil
@@ -138,18 +139,21 @@ def inputBox():
     TI = ttk.Combobox(ibox, textvariable = ti, values=TILIST,width=10)
     TI.grid(row=1,column=1)
 
-    button = tk.Button(ibox,text = "Export", command=lambda:dummyDone(ibox))
+    button = tk.Button(ibox,text = "Export", command=lambda:checkit(ibox,entry,ti))
     button.grid(row=2,column=0,columnspan=2,pady=10)
 
-    interval=entry.get()
+def checkit(ibox,entry,ti):
+    interval=int(entry.get())
     hm=ti.get()
     interval=int(interval)
+    print "interval :", interval
     if hm=="HOURS":
         interval=interval*60
+        print interval
     global rrr,sss,ddd
     export.output_to_file(rrr,ddd,sss,interval)
 
-    
+    dummyDone(ibox)
     ibox.mainloop()  
 
 
@@ -173,13 +177,22 @@ def update_maxmin(temp):
         mx=float(mx)
         temp = float(temp)
         if temp>mx:
-            if float(temp)<85:
+            if float(temp)<85.0:
                 mx=temp
                 # print "HEY!"
-            # else:
+            elif float(temp)>85.0:
+                mx=temp
+                buzzer.alarmstart()
+                errorBox("Maximum Temperature exceeded")
+                buzzer.alarmstop()
+            #else:
                 # print "Hil-gaya"
         elif temp<mn:
             mn=temp
+            if mn<-5:
+                buzzer.alarmstart()
+                errorBox("Minimum Temperature exceeded")
+                buzzer.alarmstart()
     else:
         mx=temp
         mn=temp
@@ -208,7 +221,9 @@ def recorder(num = 1):
         prev_time=todaytime
         if float(tt)==85.0:
             t1.configure(text = "--")
+            buzzer.alarmstart()
             errorBox("Check the connection")
+            buzzer.alarmstop()
         else:
             t1.configure(text = tt)
         t2.configure(text = mx)
@@ -221,8 +236,11 @@ def recorder(num = 1):
         if today>=starttime:
             if nn != 2:
                 nn=1
-            dbms.todbms(tt,prev_date,prev_time,num)
-            print "start"
+            x=0
+            x=dbms.todbms(tt,prev_date,prev_time,num)
+            if x==2:
+                global rrr,sss,ddd
+                audio.sendaudio(tt,prev_date,prev_time,rrr,ddd,sss,num)
         if nn==1:
             nn=2
             print "done"
@@ -416,7 +434,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(ViewOutput)
+        self.show_frame(Login)
 
     def show_frame(self, cont):
 
@@ -1039,7 +1057,7 @@ class Output(tk.Frame):
                 global rrr,sss,ddd, outfile,out
                 output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)
                 num_lines = sum(1 for line in open('output.text'))
-                out.config(height=num_lines)
+                out.config(height=num_lines+100)
                 file = open('output.text','r')
                 out.insert(tk.INSERT,file.read())
                 file.close()
@@ -1086,7 +1104,7 @@ class ViewOutput(tk.Frame):
         # num_lines = sum(1 for line in open('output.text'))
         # print num_lines
         global out
-        out = tk.Text(frame, state="normal",width = 100,height = 400)
+        out = tk.Text(frame, state="normal",width = 90,height = 0)
         out.pack()
         # text = tk.Label(frame,text=file.read(),justify = "left")
         # for i in range(1, rows):

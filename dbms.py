@@ -1,4 +1,5 @@
 import MySQLdb
+import toaudio
 
 db = MySQLdb.connect("localhost","root","password","CRT1")
 cursor = db.cursor()
@@ -15,4 +16,6 @@ def todbms(tt,date,time,num):
         temper=str(tt)
         sql = ("""INSERT INTO TEMPERATURES1 VALUES ('%s','%s','%s');""" %(stringdate,stringtime,temper))
         cursor.execute(sql)
-        db.commit()    
+        db.commit()
+        return "1"
+    return "0"

@@ -5,9 +5,9 @@ def sendAudio(t,date,time,r,d,s,num):
     if num%60==0:
         try:
             if(t>=0):
-                a="1 RRRR + SSSS + DDDD" + "\n" + "2" + date+" +"+time+" +"+t+" Deg C"
+                a="1 "+r+" "+d+" "+s + "\n" + "2" + date+" +"+time+" +"+t+" Deg C"
             else:
-                a="1 RRRR + SSSS + DDDD" + "\n" + "2" + date+" +"+time+" -"+t+" Deg C"
+                a="1 "+r+" "+d+" "+s + "\n" + "2" + date+" +"+time+" -"+t+" Deg C"
             b = bin(int(binascii.hexlify(c),16))
 
             sample_stream=[]
@@ -26,4 +26,4 @@ def sendAudio(t,date,time,r,d,s,num):
             stream = p.open(format = p.get_format_from_width(4),channels=1,rate=44100,output=True)
             #stream.write(sample_buffer)   """ ISKO CHALAANE PE INFINITE LOOP AARA HAI AND KUCH HO NHI RAHA!! """
         except:
-            pass
+            print "EXCEPTION PHEKA"

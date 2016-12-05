@@ -22,10 +22,10 @@ def output_to_file(r,d,s,interval):
     sql = ("""SELECT * FROM TEMPERATURES1;""")		#Retrieving data from whole dbms
     cursor.execute(sql)
     result = cursor.fetchall()
-    giveresult(result,intt)
+    giveresult(result,intt,outfile)
   
 
-def giveresult(result,interval):
+def giveresult(result,interval,outfile):
   
     num=0																				#To deal with the timeinterval(in minutes)	
     maxtemp = result[0][2]
@@ -70,7 +70,7 @@ def giveresult(result,interval):
             absmintime=outtime
 
 	intt=int(interval)		
-	if num%intt==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
+	if num==intt:  #num%60==0																	for every hour (increasing num at every minute(reading))
             if perdate!=outdate:
                 perdate=outdate
                 outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
@@ -101,8 +101,9 @@ def giveresult(result,interval):
                 outstring = "2 "+str(outdate)+" "+outtime+" +" +str(outtemp)+" Deg C"
             else :
                 outstring = "2 "+str(outdate)+" "+outtime+" -" + str(outtemp)+" Deg C"
-        outfile.write(outstring+"\n")
-		
+            outfile.write(outstring+"\n")
+	    num=1
+	    
         num=num+1
 															
     outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
