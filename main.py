@@ -1131,7 +1131,7 @@ class ViewOutput(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-50,sticky="w")
+        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-50,columnspan=3,sticky="w")
 
         outputFrame = tk.Frame(self)
         # vscrollbar = AutoScrollbar(outputFrame)
