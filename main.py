@@ -204,7 +204,7 @@ def update_maxmin(temp):
 
 def recorder(num = 1):
     global app
-    global t1,t2,t3,date,time,rrr,sss,ddd,rrrr,ssss,div,mx,mn,prev_date
+    global t1,t2,t3,date,times,rrr,sss,ddd,rrrr,ssss,div,mx,mn,prev_date
     if num is 1:
         rrrr.configure(text=rrr.upper())
         ssss.configure(text=sss.upper())
@@ -233,7 +233,7 @@ def recorder(num = 1):
         t2.configure(text = mx)
         t3.configure(text = mn)
         date.configure(text = prev_date)
-        time.configure(text=prev_time)
+        times.configure(text=prev_time)
         global c,d,f,labelr,nn
         curr = str(f+" "+c+":"+d+":00")
         starttime=datetime.datetime.strptime(curr,"%d-%m-%Y %H:%M:%S")
@@ -256,11 +256,11 @@ def recorder(num = 1):
 
 
 
-def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
+def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
 
     db = MySQLdb.connect("localhost","root","password") 							#connect the database
     cursor = db.cursor()
-    print (str(d1))
+    print (str(dx))
   
     sql= """USE CRT1;"""
     cursor.execute(sql)
@@ -270,20 +270,35 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     global rrr,sss,ddd
     outstring1 = "1 "+rrr+" "+ddd+" "+sss
     outfile.write(outstring1+"\n")
-    d1=str(d1)
+    dx=str(dx)
     d2=str(d2)
+    print dx
+    print d2
+    
+    
     #time1=str(time1)
     #time2=str(time2)
-    hh1=str(hh1)
+    hh12=str(hh12)
+    print hh12
     hh2=str(hh2)
     mm1=str(mm1)
+    print mm1
     mm2=str(mm2)
 
-    time1=str(hh1+":"+mm1)
-    time2=str(hh2+":"+mm2)
+    timex=hh12+":"+mm1+":00"
+    print timex
+    time2=hh2+":"+mm2+":00"
+
+    dx=dx+" "+timex
+    d2=d2+" "+time2
+
+    print dx
+    print d2
+    startepoch=int(time.mktime(time.strptime(dx,"%d-%m-%Y %H:%M:%S")))
+    endepoch=int(time.mktime(time.strptime(d2,"%d-%m-%Y %H:%M:%S")))
     #sql = ("""SELECT * FROM TEMPERATURES1;""")
     #sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATE = '%s' AND TIME='%s')
-    sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATE = '%s' AND TIME>'%s') OR (DATE > '%s' AND DATE<'%s') OR (DATE = '%s' AND TIME<'%s');""" %(d1,time1,d1,d2,d2,time2))	
+    sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATETIME > '%s') AND (DATETIME < '%s');""" %(str(startepoch),str(endepoch)))	
     #sql = ("""SELECT * FROM TEMPERATURES1 WHERE (TIME>'%s');""" %(time1))
     cursor.execute(sql)
     result = cursor.fetchall()
@@ -291,17 +306,19 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     print "33"
     #giveresult(result,interval)
     num=0																				#To deal with the timeinterval(in minutes)	
-    maxtemp = result[0][2]
-    mintemp = result[0][2]
+    maxtemp = result[0][1]
+    mintemp = result[0][1]
 	
-    absmaxtemp = result[0][2]
-    absmintemp = result[0][2]
+    absmaxtemp = result[0][1]
+    absmintemp = result[0][1]
+
+    kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(result[0][0])))
 	
-    x=result[0][0]
-    y=result[0][1]
+    x=kk[:10]
+    y=kk[11:16]
 	
     mindate =x																				#min ki date
-    maxdate	=x																			
+    maxdate =x																			
 	
     absmaxdate =x																		#absolute max ki date
     absmindate =x
@@ -318,9 +335,10 @@ def output_on_screen(r,d,s,interval,d1,d2,hh1,hh2,mm1,mm2):
     outstring4="4 " +str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"
 	
     for row in result:
-        outdate = row[0]
-	outtime = row[1]
-	outtemp = row[2]
+        kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(row[0])))
+        outdate = kk[:10]
+	outtime = kk[11:16]
+	outtemp = row[1]
 	temptemp=outtemp
 	if outtemp>=absmaxtemp:															#changing absolute maximum and minimum(which will be per minute)
             absmaxtemp=outtemp
@@ -796,16 +814,16 @@ class MainScreen(tk.Frame):
         grid1.grid_columnconfigure(1,weight=1,minsize = 250)
         grid1.grid_columnconfigure(2,weight=1,minsize = 250)
 
-        global date,time,rrrr,ssss,div,t1,t2,t3
+        global date,times,rrrr,ssss,div,t1,t2,t3
 
         date = tk.Label(grid1, text = "DD/MM/YYYY",font = controller.defaultFont)
-        time = tk.Label(grid1, text = "HH/MM",font = controller.defaultFont)
+        times = tk.Label(grid1, text = "HH/MM",font = controller.defaultFont)
         rrrr = tk.Label(grid1, text = "RRRR",font = controller.defaultFont)
         div = tk.Label(grid1, text = "DIV",font = controller.defaultFont)
         ssss = tk.Label(grid1, text = "SSSS",font = controller.defaultFont)
 
         date.grid(row=0, column = 0,pady=20)
-        time.grid(row=0,column = 2,pady=20)
+        times.grid(row=0,column = 2,pady=20)
         rrrr.grid(row=1, column = 0,pady=20)
         div.grid(row=1, column = 1,pady=20)
         ssss.grid(row=1, column = 2,pady=20)
@@ -1047,7 +1065,7 @@ class Output(tk.Frame):
 
     def validate(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
 
-        a = hh1.get()
+        axx = hh1.get()
         b = mm1.get()
         c = hh2.get()
         d = mm2.get()
@@ -1057,9 +1075,9 @@ class Output(tk.Frame):
         h = re.search("^[0-9]+$",g)
         # print h.group(0)
 
-        if not (a and b and c and d and e and f and h):
+        if not (axx and b and c and d and e and f and h):
             if e:
-                if a:
+                if axx:
                     if b:
                         if f:
                             if c:
@@ -1081,7 +1099,7 @@ class Output(tk.Frame):
             else:
                 errorBox("Please Enter Starting Date")
         else:
-            start_date = e + " " + a +":" + b + ":00"
+            start_date = e + " " + axx +":" + b + ":00"
             end_date = f + " " + c +":" + d + ":00"
             # print current_date,start_date
             a=str(datetime.datetime.now())
@@ -1099,17 +1117,17 @@ class Output(tk.Frame):
                 if calframe:
                     calframe.grid_forget()
                 global rrr,sss,ddd, outfile,out
-                output_on_screen(rrr,ddd,sss,g,e,f,a,c,b,d)
+                output_on_screen(rrr,ddd,sss,g,e,f,axx,c,b,d)
                 # num_lines = sum(1 for line in open('output.text'))
                 # out.config(height=num_lines+100)
                 # file = open('output.text','r')
                 # file.close()
                 controller.read_file_helper()
                 controller.it = -1
-                a = controller.read_file(1)
+                fi = controller.read_file(1)
                 out.config(state="normal")
                 out.delete('1.0',"end")
-                for x in a:
+                for x in fi:
                     out.insert(tk.INSERT,x)
                 out.config(state="disabled")
                               
