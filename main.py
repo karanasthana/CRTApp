@@ -1134,24 +1134,24 @@ class ViewOutput(tk.Frame):
         buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-50,columnspan=3,sticky="w")
 
         outputFrame = tk.Frame(self)
-        # vscrollbar = AutoScrollbar(outputFrame)
-        # vscrollbar.grid(row=0, column=1, sticky="ns")
-        # hscrollbar = AutoScrollbar(outputFrame, orient="horizontal")
-        # hscrollbar.grid(row=1, column=0, sticky="ew")
-        # canvas = tk.Canvas(outputFrame, yscrollcommand=vscrollbar.set, xscrollcommand=hscrollbar.set,width=650)
-        # canvas.grid(row=0, column=0, sticky="nsew")
-        # vscrollbar.config(command=canvas.yview)
-        # hscrollbar.config(command=canvas.xview)
-        # outputFrame.grid_rowconfigure(0, weight=1)
-        # outputFrame.grid_columnconfigure(0, weight=1)
-        # frame = tk.Frame(canvas)
-        # frame.rowconfigure(1, weight=1)
-        # frame.columnconfigure(1, weight=1)
+        vscrollbar = AutoScrollbar(outputFrame)
+        vscrollbar.grid(row=0, column=1, sticky="ns")
+        hscrollbar = AutoScrollbar(outputFrame, orient="horizontal")
+        hscrollbar.grid(row=1, column=0, sticky="ew")
+        canvas = tk.Canvas(outputFrame, yscrollcommand=vscrollbar.set, xscrollcommand=hscrollbar.set,width=650)
+        canvas.grid(row=0, column=0, sticky="nsew")
+        vscrollbar.config(command=canvas.yview)
+        hscrollbar.config(command=canvas.xview)
+        outputFrame.grid_rowconfigure(0, weight=1)
+        outputFrame.grid_columnconfigure(0, weight=1)
+        frame = tk.Frame(canvas)
+        frame.rowconfigure(1, weight=1)
+        frame.columnconfigure(1, weight=1)
         
         # num_lines = sum(1 for line in open('output.text'))
         # print num_lines
         global out
-        out = tk.Text(outputFrame, state="normal",width = 90,height = 25)
+        out = tk.Text(frame, state="normal",width = 90,height = 25)
         out.pack()
         # text = tk.Label(frame,text=file.read(),justify = "left")
         # for i in range(1, rows):
@@ -1161,15 +1161,15 @@ class ViewOutput(tk.Frame):
         # frame.rowconfigure(1, weight=1)
         # frame.columnconfigure(1, weight=1)
         # text.pack()
-        # canvas.create_window(0, 0, anchor="nw", window=frame)
-        # frame.update_idletasks()
-        # canvas.config(scrollregion=canvas.bbox("all"))
+        canvas.create_window(0, 0, anchor="nw", window=frame)
+        frame.update_idletasks()
+        canvas.config(scrollregion=canvas.bbox("all"))
 
         outputFrame.grid(row=2,column=0,pady=ENTRYFRAMEPADY,padx=35)
 
 
         backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(Menu))
-        bButton = ttk.Button(buttons, text = "<", command = lambda : self.backPage(controller,out,bButton,nButton),width = 3)
+        bButton = ttk.Button(buttons, text = "<", command = lambda : self.backPage(controller,out,bButton,nButton),width = 3,state="disabled")
         nButton = ttk.Button(buttons, text = ">", command = lambda : self.nextPage(controller,out,bButton,nButton), width = 3)
 
         bButton.grid(padx = 5,row=0,column=0)
