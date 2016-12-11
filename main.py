@@ -6,7 +6,6 @@ import tkMessageBox
 import subprocess
 import os
 import MySQLdb
-from PIL import Image,ImageTk
 
 # USER DEFINED 
 import pcalendar
@@ -501,24 +500,24 @@ class CRTApp(tk.Tk):
         
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.wm_title(self,"CRTApp")
-        image = Image.open("img/save.png")
-        self.save = ImageTk.PhotoImage(image)
-        image = Image.open("img/right.png")
-        self.next = ImageTk.PhotoImage(image)
-        image = Image.open("img/left.png")
-        self.back = ImageTk.PhotoImage(image)
-        image = Image.open("img/start.png")
-        self.start = ImageTk.PhotoImage(image)
-        image = Image.open("img/output.png")
-        self.output = ImageTk.PhotoImage(image)
-        image = Image.open("img/menu.png")
-        self.menu = ImageTk.PhotoImage(image)
-        image = Image.open("img/ok.png")
-        self.ok = ImageTk.PhotoImage(image)
-        image = Image.open("img/rec.png")
-        self.rec = ImageTk.PhotoImage(image)
-        image = Image.open("img/nrec.png")
-        self.nrec = ImageTk.PhotoImage(image)
+        # image = Image.open("img/save.png")
+        self.save = tk.PhotoImage(file="img/save.gif")
+        # image = Image.open("img/right.png")
+        self.next = tk.PhotoImage(file="img/right.gif")
+        # image = Image.open("img/left.png")
+        self.back = tk.PhotoImage(file="img/left.gif")
+        # image = Image.open("img/start.png")
+        self.start = tk.PhotoImage(file="img/start.gif")
+        # image = Image.open("img/output.png")
+        self.output = tk.PhotoImage(file="img/output.gif")
+        # image = Image.open("img/menu.png")
+        self.menu = tk.PhotoImage(file="img/menu.gif")
+        # image = Image.open("img/ok.png")
+        self.ok = tk.PhotoImage(file="img/ok.gif")
+        # image = Image.open("img/rec.png")
+        self.rec = tk.PhotoImage(file="img/rec.gif")
+        # image = Image.open("img/nrec.png")
+        self.nrec = tk.PhotoImage(file="img/nrec.gif")
         #self.wm_geometry("800x480")
         # self.attributes("-zoomed",True)
         # self.attributes("-fullscreen",True)
@@ -549,7 +548,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        time.sleep(10)
+        time.sleep(3)
         self.logo.place_forget()
         self.show_frame(Login)
 
@@ -655,9 +654,7 @@ class Splash(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        image = Image.open("img/logo.png")
-        photo = ImageTk.PhotoImage(image)
-        # logo = tk.PhotoImage(file="")
+        photo = tk.PhotoImage(file="img/logo.gif")
         controller.logo = tk.Label(parent,image=photo)
         controller.logo.image = photo # keep a reference!
         controller.logo.place(relx=0.5, rely=0.4, anchor="center")
@@ -1127,8 +1124,8 @@ class Settings(tk.Frame):
         global MAXIMUM,MINIMUM
         xx=Entry1.get()
         yy=Entry2.get()
-        checkmx = re.search("^[\-]{0,1}[0-9]+[\.]{0,1}[0-9]{0,1}$",xx)
-        checkmn = re.search("^[\-]{0,1}[0-9]+[\.]{0,1}[0-9]{0,1}$",yy)
+        checkmx = re.search("(^[\-]{0,1}[0-9]+[\.][0-9]$)|(^[\-]{0,1}[0-9]+$)",xx)
+        checkmn = re.search("(^[\-]{0,1}[0-9]+[\.][0-9]$)|(^[\-]{0,1}[0-9]+$)",yy)
         fl = 0
         if checkmx:
             if checkmn:
@@ -1596,9 +1593,8 @@ class PasswordChange(tk.Frame):
         		flag = 1
         		global PASSWORD
         		PASSWORD = p1
-        	if flag == 1:
-        		x = infoBox("Done")
-        	if x == 1:
+        		infoBox("Done")
+        	if flag==1:
         		controller.show_frame(Menu)
         	else:
         		errorBox("Password doesn't Match")
