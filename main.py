@@ -39,7 +39,6 @@ def errorBox(msg):
 def infoBox(msg):
 
     tkMessageBox.showinfo("Done",msg)
-    return 1
 
 def center(x):
     x.update_idletasks()
