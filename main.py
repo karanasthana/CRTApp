@@ -15,7 +15,7 @@ import pcalendar
 # import temperature
 # import export
 # import buzzer
-#import Voltagechecker
+# import Voltagechecker
 
 import glob
 import shutil
@@ -30,48 +30,6 @@ except ImportError:
     import tkinter as tk
     import tkinter.font as tkFont
     import tkinter.ttk as ttk
-
-
-def errorBox(msg):
-
-    tkMessageBox.showerror("Error", msg)
-
-def infoBox(msg):
-
-    tkMessageBox.showinfo("Done",msg)
-    return 1
-
-def center(x):
-    x.update_idletasks()
-    w=x.winfo_screenwidth()
-    h=x.winfo_screenheight()
-    size=tuple(int(_) for _ in x.geometry().split('+')[0].split('x'))
-    xx=w/2-size[0]/2
-    yy=h/2-size[1]/2
-    x.geometry("%dx%d+%d+%d" % (size + (xx,yy)))
-
-def dummyDone(x):
-    print "done"
-    global app
-    x.destroy()
-    dbox = tk.Toplevel(app)
-    dbox.wm_title("Done")
-    dbox.wm_geometry("360x100")
-    
-    center(dbox)
-
-    defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
-    buttonFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
-
-    label = tk.Label(dbox,text="Exporting Done",font = defaultFont)
-    label.grid(padx=10,pady=10,sticky="w")
-
-    button = tk.Button(dbox,text = "OK", command=dbox.destroy,image=app.ok,compound="left",font=buttonFont)
-    button.grid(row=1,column=1,pady=10,sticky="e",padx=30)
-
-    dbox.mainloop()
-
-
 
 """#def dummyProgress(x):
 
@@ -121,10 +79,49 @@ ddd = "RRRR"
 mmm = "RRRR"
 MAXIMUM = 85.0
 MINIMUM = -5.0
-#mn=85.0
-#mx=-5.0
 maxminsiren1=0
 maxminsiren2=0
+
+
+
+def errorBox(msg):
+
+    tkMessageBox.showerror("Error", msg)
+
+def infoBox(msg):
+
+    tkMessageBox.showinfo("Done",msg)
+    return 1
+
+def center(x):
+    x.update_idletasks()
+    w=x.winfo_screenwidth()
+    h=x.winfo_screenheight()
+    size=tuple(int(_) for _ in x.geometry().split('+')[0].split('x'))
+    xx=w/2-size[0]/2
+    yy=h/2-size[1]/2
+    x.geometry("%dx%d+%d+%d" % (size + (xx,yy)))
+
+def dummyDone(x):
+    print "done"
+    global app
+    x.destroy()
+    dbox = tk.Toplevel(app)
+    dbox.wm_title("Done")
+    dbox.wm_geometry("360x100")
+    
+    center(dbox)
+
+    defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
+    buttonFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
+
+    label = tk.Label(dbox,text="Exporting Done",font = defaultFont)
+    label.grid(padx=10,pady=10,sticky="w")
+
+    button = tk.Button(dbox,text = "OK", command=dbox.destroy,image=app.ok,compound="left",font=buttonFont)
+    button.grid(row=1,column=1,pady=10,sticky="e",padx=30)
+
+    dbox.mainloop()
 
 
 def inputBox():
@@ -570,6 +567,9 @@ class CRTApp(tk.Tk):
         self.defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
         self.headerFont = tkFont.Font(family = "Helvetica", size = 16, weight = "bold")
         self.buttonFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
+
+        # bigfont = tkFont.Font(family="Helvetica",size=12,weight="bold")
+        self.option_add("*TCombobox*Listbox*Font", self.defaultFont)
 
         # container.grid_rowconfigure(0, weight=1)
         # container.grid_columnconfigure(0, weight=1)
