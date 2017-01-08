@@ -1,5 +1,3 @@
-
-
 import calendar
 import time
 import datetime
@@ -7,21 +5,21 @@ import re
 import tkMessageBox
 import subprocess
 import os
-import MySQLdb
+# import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-import toaudio
-import dbms
-import usb
-import temperature
-import export
-import buzzer
+# import toaudio
+# import dbms
+# import usb
+# import temperature
+# import export
+# import buzzer
 #import Voltagechecker
 
 import glob
 import shutil
-import pyaudio
+# import pyaudio
 import binascii
 
 try:
@@ -105,6 +103,7 @@ MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
             "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
+HOMEDIR = "/home/anupam/WorkSpace/CRTApp"
 returnToMenu = False
 MINSIZEROW2 = 300
 MINSIZEROW3 = 0
@@ -133,8 +132,9 @@ def inputBox():
     ibox = tk.Toplevel(app)
     ibox.wm_geometry("460x130")
     ibox.wm_title("Time Interval")
+    ibox.wm_resizable( width=False, height=False)
     center(ibox)
-    defaultFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
+    defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
 
     label = tk.Label(ibox,text="Enter Time Interval",font = defaultFont)
     label.grid(padx=10,pady=10,columnspan=2,sticky="w")
@@ -531,23 +531,23 @@ class CRTApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.wm_title(self,"CRTApp")
         # image = Image.open("img/save.png")
-        self.save = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/save.gif")
+        self.save = tk.PhotoImage(file=HOMEDIR+"/img/save.gif")
         # image = Image.open("img/right.png")
-        self.next = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/right.gif")
+        self.next = tk.PhotoImage(file=HOMEDIR+"/img/right.gif")
         # image = Image.open("img/left.png")
-        self.back = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/left.gif")
+        self.back = tk.PhotoImage(file=HOMEDIR+"/img/left.gif")
         # image = Image.open("img/start.png")
-        self.start = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/start.gif")
+        self.start = tk.PhotoImage(file=HOMEDIR+"/img/start.gif")
         # image = Image.open("img/output.png")
-        self.output = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/output.gif")
+        self.output = tk.PhotoImage(file=HOMEDIR+"/img/output.gif")
         # image = Image.open("img/menu.png")
-        self.menu = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/menu.gif")
+        self.menu = tk.PhotoImage(file=HOMEDIR+"/img/menu.gif")
         # image = Image.open("img/ok.png")
-        self.ok = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/ok.gif")
+        self.ok = tk.PhotoImage(file=HOMEDIR+"/img/ok.gif")
         # image = Image.open("img/rec.png")
-        self.rec = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/rec.gif")
+        self.rec = tk.PhotoImage(file=HOMEDIR+"/img/rec.gif")
         # image = Image.open("img/nrec.png")
-        self.nrec = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/nrec.gif")
+        self.nrec = tk.PhotoImage(file=HOMEDIR+"/img/nrec.gif")
         #self.wm_geometry("800x480")
         # self.attributes("-zoomed",True)
         # self.attributes("-fullscreen",True)
@@ -564,8 +564,8 @@ class CRTApp(tk.Tk):
         # container.grid_rowconfigure(0, weight=1,minsize =480)
         # container.grid_columnconfigure(0, weight=1,minsize=800)
 
-        self.defaultFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
-        self.headerFont = tkFont.Font(family = "Helvetica", size = 14, weight = "bold")
+        self.defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
+        self.headerFont = tkFont.Font(family = "Helvetica", size = 16, weight = "bold")
 
         # container.grid_rowconfigure(0, weight=1)
         # container.grid_columnconfigure(0, weight=1)
@@ -684,7 +684,7 @@ class Splash(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        photo = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/logo.gif")
+        photo = tk.PhotoImage(file=HOMEDIR+"/img/logo.gif")
         controller.logo = tk.Label(parent,image=photo)
         controller.logo.image = photo # keep a reference!
         controller.logo.place(relx=0.5, rely=0.4, anchor="center")
@@ -999,11 +999,11 @@ class MainScreen(tk.Frame):
         div = tk.Label(grid1, text = "DIV",font = controller.defaultFont)
         ssss = tk.Label(grid1, text = "SSSS",font = controller.defaultFont)
 
-        date.grid(row=0, column = 0,pady=20)
-        times.grid(row=0,column = 2,pady=20)
-        rrrr.grid(row=1, column = 0,pady=20)
-        div.grid(row=1, column = 1,pady=20)
-        ssss.grid(row=1, column = 2,pady=20)
+        date.grid(row=0, column = 0,pady=10)
+        times.grid(row=0,column = 2,pady=10)
+        rrrr.grid(row=1, column = 0,pady=10)
+        div.grid(row=1, column = 1,pady=10)
+        ssss.grid(row=1, column = 2,pady=10)
 
         global labelr
         recording = tk.Frame(display)
@@ -1013,16 +1013,16 @@ class MainScreen(tk.Frame):
         recording.pack()
 
         grid2 = tk.Frame(display)
-        grid2.pack(pady=40)
+        grid2.pack(pady=20)
 
-        temp = tk.Label(grid2, text = "TEMPERATURE :",font = controller.defaultFont)
+        temp = tk.Label(grid2, text = "TEMPERATURE :",font = controller.headerFont)
         mxtemp = tk.Label(grid2, text = "MAX TEMPERATURE :",font = controller.defaultFont)
         mntemp = tk.Label(grid2, text = "MIN TEMPERATURE :",font = controller.defaultFont)
 
-        t1 = tk.Label(grid2, text = 0,font = controller.defaultFont)
+        t1 = tk.Label(grid2, text = 0,font = controller.headerFont)
         t2 = tk.Label(grid2, text = 0,font = controller.defaultFont)
         t3 = tk.Label(grid2, text = 0,font = controller.defaultFont)
-        degree1 = tk.Label(grid2, text = "*C",font = controller.defaultFont)
+        degree1 = tk.Label(grid2, text = "*C",font = controller.headerFont)
         degree2 = tk.Label(grid2, text = "*C",font = controller.defaultFont)
         degree3 = tk.Label(grid2, text = "*C",font = controller.defaultFont)
 
