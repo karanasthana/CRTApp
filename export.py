@@ -21,24 +21,31 @@ def output_to_file(r,d,s,interval):
     intt=int(interval)
     sql = ("""SELECT * FROM TEMPERATURES1;""")		#Retrieving data from whole dbms
     cursor.execute(sql)
+    print ("output_to_file ke andar hai")
     result = cursor.fetchall()
     giveresult(result,intt,outfile)
   
 
 def giveresult(result,interval,outfile):
-  
-    num=0																				#To deal with the timeinterval(in minutes)	
-    maxtemp = result[0][2]
-    mintemp = result[0][2]
+    print "42"
+    num=0
+    maxtemp = result[0][1]
+    mintemp = result[0][1]
 	
-    absmaxtemp = result[0][2]
-    absmintemp = result[0][2]
+    absmaxtemp = result[0][1]
+    absmintemp = result[0][1]
+
+    epochcalc=int(result[0][0])
+
+    kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(result[0][0])))
+
+    print ("give_result ke andar hai")
 	
-    x=result[0][0]
-    y=result[0][1]
+    x=kk[:10]
+    y=kk[11:16]
 	
     mindate =x																				#min ki date
-    maxdate	=x																			
+    maxdate =x																			
 	
     absmaxdate =x																		#absolute max ki date
     absmindate =x
@@ -55,22 +62,31 @@ def giveresult(result,interval,outfile):
     outstring4="4 " +str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"
 	
     for row in result:
-        outdate = row[0]
-	outtime = row[1]
-	outtemp = row[2]
-	temptemp=outtemp
-	if outtemp>=absmaxtemp:															#changing absolute maximum and minimum(which will be per minute)
+        print "43"
+        #number10+=1
+        kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(row[0])))
+        epochcalc2=int(row[0])
+        epochdiff1 = int((epochcalc2-epochcalc)/60)
+            
+        #if epochdiff1>(60*intt):
+            #epochcalc2=row[0]
+        outdate = kk[:10]
+        outtime = kk[11:16]
+        outtemp = row[1]
+        temptemp=outtemp
+        if outtemp>=absmaxtemp:															#changing absolute maximum and minimum(which will be per minute)
             absmaxtemp=outtemp
             absmaxdate=outdate
             absmaxtime=outtime
 		                
-	if absmintemp>=outtemp:
+        if absmintemp>=outtemp:
             absmintemp=outtemp
             absmindate=outdate
             absmintime=outtime
-
-	intt=int(interval)		
-	if num==intt:  #num%60==0																	for every hour (increasing num at every minute(reading))
+            
+        intt = int(interval)		
+        if epochdiff1%intt==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
+        #if (int(num)%1)==0:
             if perdate!=outdate:
                 perdate=outdate
                 outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
@@ -81,7 +97,7 @@ def giveresult(result,interval,outfile):
                 maxdate=outdate
                 mintime=outtime
                 maxtime=outtime
-                                
+                              
             if mintemp>=outtemp:
                 mintemp=outtemp
                 mindate=outdate
@@ -90,7 +106,7 @@ def giveresult(result,interval,outfile):
                     outstring4 = "4 "+str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"	
                 else:
                     outstring4 = "4 "+str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"
-                
+            
             if outtemp>=maxtemp:															
                 maxtemp=outtemp
                 maxdate=outdate
@@ -102,13 +118,13 @@ def giveresult(result,interval,outfile):
             else :
                 outstring = "2 "+str(outdate)+" "+outtime+" -" + str(outtemp)+" Deg C"
             outfile.write(outstring+"\n")
-	    num=1
-	    
+            print "44"
+		
         num=num+1
 															
     outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
     outfile.write(outstring4+"\n")														#Writing Line-3 and Line-4
-        
+       
     outstring5 = "5 "+str(absmaxdate)+" "+str(absmaxtime)+" +" + str(absmaxtemp)+" Deg C AB MAX"		#Writing Absolute minimum and maximum ONCE
 	
     if(absmintemp<0):
@@ -118,4 +134,13 @@ def giveresult(result,interval,outfile):
 	
     outfile.write(outstring5+"\n")	
     outfile.write(outstring6+"\n")
-    usb.usbexport()
+    #return "2"
+    print "45"
+
+
+
+
+
+
+
+
