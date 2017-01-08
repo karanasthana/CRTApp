@@ -18,17 +18,10 @@ def read_temp():
     lines=read_temp_raw()
     while lines[0].strip()[-3:]!='YES' :
         lines=read_temp_raw()
-<<<<<<< HEAD
-=======
     check_connection=lines[1]
     check_connection2=check_connection[:2]
->>>>>>> af532db9937a5d6a3c02e2562262da1833c1ca11
     equals_pos = lines[1].find('t=')
     if equals_pos != -1:
         temp_string = lines[1][equals_pos+2:]
         temp_c = ("%.1f" % (float(temp_string)/1000.0))
-<<<<<<< HEAD
-        return temp_c  
-=======
         return temp_c,check_connection2
->>>>>>> af532db9937a5d6a3c02e2562262da1833c1ca11

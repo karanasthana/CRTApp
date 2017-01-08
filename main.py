@@ -1,3 +1,5 @@
+
+
 import calendar
 import time
 import datetime
@@ -15,12 +17,12 @@ import usb
 import temperature
 import export
 import buzzer
-import Voltagechecker
+#import Voltagechecker
 
-# import glob
-# import shutil
-# import pyaudio
-# import binascii
+import glob
+import shutil
+import pyaudio
+import binascii
 
 try:
     import Tkinter as tk
@@ -39,6 +41,7 @@ def errorBox(msg):
 def infoBox(msg):
 
     tkMessageBox.showinfo("Done",msg)
+    return 1
 
 def center(x):
     x.update_idletasks()
@@ -153,18 +156,31 @@ def inputBox():
     button.grid(row=2,column=0,columnspan=2,pady=10)
 
 def checkit(ibox,entry,ti):
+    print "31"
     interval=int(entry.get())
+    print "32"
     hm=ti.get()
+    print "33"
     interval=int(interval)
+    print "34"
     print "interval :", interval
+    print "35"
     if hm=="HOURS":
         interval=interval*60
         print interval
+        print "36"
     global rrr,sss,ddd
+    print "37"
     export.output_to_file(rrr,ddd,sss,interval)
+    print "exporting done"
+    print "38"
     usb.usbexport()
+    print "39"
+    print "exporting done"
     dummyDone(ibox)
-    ibox.mainloop()  
+    print "40"
+    ibox.mainloop()
+    print "41"
 
 
 def qf():
@@ -251,20 +267,21 @@ def recorder(num = 1):
         mn=85
         prev_date=""
     if num:
-
-        voltage_val=float(Voltagechecker.checkvol())
-        if voltage_val<0.8 :
-            buzzer.shortalarm(900)
-            errorBox("LOW BATTERY")
-            buzzer.alarmstop()
-        tt=temperature.read_temp()
+        
+        execstart = time.time()*1000
+        
+        #voltage_val=float(Voltagechecker.checkvol())
+        #if voltage_val==2:
+            #buzzer.shortalarm(9000)
+            #errorBox("LOW BATTERY")
+            #buzzer.alarmstop()
+        tt,check_connection2=temperature.read_temp()
         global secondGap,maxminsiren1,maxminsiren2
         today = (datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
         today1=str(today)
         todaytime = str(today1[11:19])
         today1= str(today1[:10])
         # global mx,mn,nn
-        mx,mn=update_maxmin(tt)
         prev_date=today1
         prev_time=todaytime
         if float(tt)<MAXIMUM:
@@ -278,15 +295,16 @@ def recorder(num = 1):
             buzzer.alarmstart()
             errorBox("Check the connection")
             buzzer.alarmstop()
-        if check_connection2=="00":
+        elif check_connection2=="00":
             t1.configure(text = "--")
             buzzer.alarmstart()
             errorBox("Check the connection")
             buzzer.alarmstop()    
         else:
             t1.configure(text = tt)
-        t2.configure(text = mx)
-        t3.configure(text = mn)
+            mx,mn=update_maxmin(tt)
+            t2.configure(text = mx)
+            t3.configure(text = mn)
         date.configure(text = prev_date)
         times.configure(text=prev_time)
         global c,d,f,labelr,nn
@@ -303,22 +321,23 @@ def recorder(num = 1):
             else:
                 x=dbms.todbms(tt,prev_date,prev_time,num)
             if x==2:
-            	pass
+            	# pass
                 # global rrr,sss,ddd
-                #toaudio.sendaudio(tt,prev_date,prev_time,rrr,ddd,sss,num)
+                toaudio.sendaudio(tt,prev_date,prev_time,rrr,ddd,sss,num)
         if nn==1:
             nn=2
             print "done"
             labelr.configure(text="RECORDING")
             labelr.configure(fg="red")
-            labelr.configue(image=app.rec)
+            labelr.configure(image=app.rec)
             #toaudio(tt,prev_date,prev_time,rrr,ddd,sss,num)
 
-            
-        app.after(173, lambda:recorder(num+1))
-        # app.after(173, lambda:todbms(tt,prev_date,prev_time,num))
-        #app.after(173, lambda:sendaudio(tt,date,time,rr,ss,dd,num))
-
+        execend = time.time()*1000
+        ii = int(round(1000-(execend-execstart)))
+        if ii > 0:
+            app.after(ii,lambda:recorder(num+1))
+        else:
+            app.after(0,lambda:recorder(num+1))
 
 
 def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
@@ -333,6 +352,9 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
     outfile = open("output.text","w") 													#ismei save krenge output
 
     global rrr,sss,ddd
+    rrr=rrr.upper()
+    sss=sss.upper()
+    ddd=ddd.upper()
     outstring1 = "1 "+rrr+" "+ddd+" "+sss
     outfile.write(outstring1+"\n")
     dx=str(dx)
@@ -368,7 +390,7 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
     cursor.execute(sql)
     result = cursor.fetchall()
     #print result
-    print "33"
+    #print "33"
     #giveresult(result,interval)
     num=0																				#To deal with the timeinterval(in minutes)	
     print (len(str(result)))
@@ -382,6 +404,8 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
         absmaxtemp = result[0][1]
         absmintemp = result[0][1]
 
+        epochcalc=int(result[0][0])
+        
         kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(result[0][0])))
 	
         x=kk[:10]
@@ -403,9 +427,16 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
     
         outstring3="3 " +str(maxdate)+" "+str(maxtime)+" +" + str(maxtemp)+" Deg C HR MAX"
         outstring4="4 " +str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"
-	
+
+	number10 = 0
         for row in result:
+            #number10+=1
             kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(row[0])))
+            epochcalc2=int(row[0])
+            epochdiff1 = int((epochcalc2-epochcalc)/60)
+            
+            #if epochdiff1>(60*intt):
+                #epochcalc2=row[0]
             outdate = kk[:10]
             outtime = kk[11:16]
             outtemp = row[1]
@@ -419,9 +450,9 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
                 absmintemp=outtemp
                 absmindate=outdate
                 absmintime=outtime
-
+            
             intt = int(interval)		
-            if int(num)%intt==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
+            if epochdiff1%intt==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
             #if (int(num)%1)==0:
                 if perdate!=outdate:
                     perdate=outdate
@@ -500,23 +531,23 @@ class CRTApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.wm_title(self,"CRTApp")
         # image = Image.open("img/save.png")
-        self.save = tk.PhotoImage(file="img/save.gif")
+        self.save = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/save.gif")
         # image = Image.open("img/right.png")
-        self.next = tk.PhotoImage(file="img/right.gif")
+        self.next = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/right.gif")
         # image = Image.open("img/left.png")
-        self.back = tk.PhotoImage(file="img/left.gif")
+        self.back = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/left.gif")
         # image = Image.open("img/start.png")
-        self.start = tk.PhotoImage(file="img/start.gif")
+        self.start = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/start.gif")
         # image = Image.open("img/output.png")
-        self.output = tk.PhotoImage(file="img/output.gif")
+        self.output = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/output.gif")
         # image = Image.open("img/menu.png")
-        self.menu = tk.PhotoImage(file="img/menu.gif")
+        self.menu = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/menu.gif")
         # image = Image.open("img/ok.png")
-        self.ok = tk.PhotoImage(file="img/ok.gif")
+        self.ok = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/ok.gif")
         # image = Image.open("img/rec.png")
-        self.rec = tk.PhotoImage(file="img/rec.gif")
+        self.rec = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/rec.gif")
         # image = Image.open("img/nrec.png")
-        self.nrec = tk.PhotoImage(file="img/nrec.gif")
+        self.nrec = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/nrec.gif")
         #self.wm_geometry("800x480")
         # self.attributes("-zoomed",True)
         # self.attributes("-fullscreen",True)
@@ -653,7 +684,7 @@ class Splash(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        photo = tk.PhotoImage(file="img/logo.gif")
+        photo = tk.PhotoImage(file="/home/pi/Downloads/CRTApp/img/logo.gif")
         controller.logo = tk.Label(parent,image=photo)
         controller.logo.image = photo # keep a reference!
         controller.logo.place(relx=0.5, rely=0.4, anchor="center")

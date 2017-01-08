@@ -13,8 +13,6 @@ def alarmstart():
         gpio.cleanup()
         exit
 
-<<<<<<< HEAD
-=======
 def shortalarm(num):
 
     gpio.setwarnings(False)
@@ -31,7 +29,6 @@ def shortalarm(num):
             gpio.cleanup()
             exit
 
->>>>>>> af532db9937a5d6a3c02e2562262da1833c1ca11
 def alarmstop():
     gpio.setwarnings(False)
     gpio.setmode(gpio.BOARD)
@@ -45,9 +42,5 @@ def alarmstop():
         exit
 
 
-<<<<<<< HEAD
-#alarmstop()
-=======
 
->>>>>>> af532db9937a5d6a3c02e2562262da1833c1ca11
 
