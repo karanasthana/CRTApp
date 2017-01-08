@@ -60,12 +60,13 @@ def dummyDone(x):
     
     center(dbox)
 
-    defaultFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
+    defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
+    buttonFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
 
     label = tk.Label(dbox,text="Exporting Done",font = defaultFont)
     label.grid(padx=10,pady=10,sticky="w")
 
-    button = tk.Button(dbox,text = "OK", command=dbox.destroy,image=app.ok,compound="left")
+    button = tk.Button(dbox,text = "OK", command=dbox.destroy,image=app.ok,compound="left",font=buttonFont)
     button.grid(row=1,column=1,pady=10,sticky="e",padx=30)
 
     dbox.mainloop()
@@ -135,13 +136,14 @@ def inputBox():
     ibox.wm_resizable( width=False, height=False)
     center(ibox)
     defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
+    buttonFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
 
     label = tk.Label(ibox,text="Enter Time Interval",font = defaultFont)
     label.grid(padx=10,pady=10,columnspan=2,sticky="w")
 
     v= tk.StringVar()
 
-    entry = tk.Entry(ibox,width=40,textvariable=v)
+    entry = tk.Entry(ibox,width=30,textvariable=v,font=defaultFont)
     entry.grid(row=1,column=0,padx=10)
     entry.bind("<FocusIn>",lambda x: subprocess.Popen("matchbox-keyboard"))
     entry.bind("<FocusOut>",lambda x: os.system("killall matchbox-keyboard"))
@@ -149,10 +151,10 @@ def inputBox():
 
     ti = tk.StringVar(ibox)
     ti.set(TILIST[0])
-    TI = ttk.Combobox(ibox, textvariable = ti, values=TILIST,width=10)
+    TI = ttk.Combobox(ibox, textvariable = ti, values=TILIST,width=10,font=defaultFont)
     TI.grid(row=1,column=1)
 
-    button = tk.Button(ibox,text = "Export", command=lambda:checkit(ibox,entry,ti),image=app.output,compound="left")
+    button = tk.Button(ibox,text = "Export", command=lambda:checkit(ibox,entry,ti),image=app.output,compound="left",font=buttonFont)
     button.grid(row=2,column=0,columnspan=2,pady=10)
 
 def checkit(ibox,entry,ti):
@@ -566,6 +568,7 @@ class CRTApp(tk.Tk):
 
         self.defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
         self.headerFont = tkFont.Font(family = "Helvetica", size = 16, weight = "bold")
+        self.buttonFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
 
         # container.grid_rowconfigure(0, weight=1)
         # container.grid_columnconfigure(0, weight=1)
@@ -726,10 +729,10 @@ class TMSConfig(tk.Frame):
         self.x = tk.StringVar()
         self.y = tk.StringVar()
         self.z = tk.StringVar()
-        entry1 = tk.Entry(entry,textvariable=self.w)
-        entry2 = tk.Entry(entry,textvariable=self.x)
-        entry3 = tk.Entry(entry,textvariable=self.y)
-        entry4 = tk.Entry(entry,textvariable=self.z)
+        entry1 = tk.Entry(entry,textvariable=self.w,font=controller.defaultFont)
+        entry2 = tk.Entry(entry,textvariable=self.x,font=controller.defaultFont)
+        entry3 = tk.Entry(entry,textvariable=self.y,font=controller.defaultFont)
+        entry4 = tk.Entry(entry,textvariable=self.z,font=controller.defaultFont)
 
         # entry1.focus_set()
         entry1.bind("<FocusIn>",controller.call_keyboard)
@@ -754,7 +757,8 @@ class TMSConfig(tk.Frame):
         entry4.grid(row = 3, column =1,padx = 80)
 
         
-        nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2,entry3,entry4,buttons),image=controller.save,compound="left")
+        nextButton = tk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2,entry3,entry4,buttons)
+            ,image=controller.save,compound="left",font=controller.buttonFont)
 
         nextButton.grid(row=0,column=0)
         # print self.grid_size()
@@ -804,8 +808,8 @@ class TMSConfig(tk.Frame):
                 controller.show_frame(Menu)
             else:
             	# buttons.config(padx=BUTTONFRAMEPADX)
-            	backButton = ttk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left")
-            	nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,rr,dd,ss,mn,buttons),image=controller.save,compound="left")
+            	backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
+            	nextButton = tk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,rr,dd,ss,mn,buttons),image=controller.save,compound="left",font=controller.buttonFont)
             	backButton.grid(row=0,column=0)
             	nextButton.grid(row=0,column=1,padx=10)
             	controller.show_frame(DateTimeSetting)
@@ -850,33 +854,33 @@ class DateTimeSetting(tk.Frame):
         label3 = tk.Label(entry, text = "START DATE :",font=controller.defaultFont)
         label4 = tk.Label(entry, text = "START TIME :",font=controller.defaultFont)
 
-        entry1 = tk.Entry(entry)
+        entry1 = tk.Entry(entry,font=controller.defaultFont)
 
         time1 = tk.Frame(entry)
 
         hh1 = tk.StringVar(time1)
         hh1.set(HHLIST[0])
-        HH1 = ttk.Combobox(time1, textvariable = hh1, values=HHLIST,width=7)
+        HH1 = ttk.Combobox(time1, textvariable = hh1, values=HHLIST,width=8,font=controller.defaultFont)
         HH1.grid(row=0,column=0,padx=3)
         
         mm1 = tk.StringVar(time1)
         mm1.set(MMLIST[0])
-        MM1 = ttk.Combobox(time1, textvariable = mm1, values=MMLIST,width=7)
+        MM1 = ttk.Combobox(time1, textvariable = mm1, values=MMLIST,width=8,font=controller.defaultFont)
         MM1.grid(row=0,column = 1,padx=3)
                 
         time2 = tk.Frame(entry)
         
         hh2 = tk.StringVar(time2)
         hh2.set(HHLIST[0])
-        HH2 = ttk.Combobox(time2, textvariable = hh2, values=HHLIST,width=7)
+        HH2 = ttk.Combobox(time2, textvariable = hh2, values=HHLIST,width=8,font=controller.defaultFont)
         HH2.grid(row=0,column=0,padx=3)
         
         mm2 = tk.StringVar(time2)
         mm2.set(MMLIST[0])
-        MM2 = ttk.Combobox(time2, textvariable = mm2, values=MMLIST,width=7)
+        MM2 = ttk.Combobox(time2, textvariable = mm2, values=MMLIST,width=8,font=controller.defaultFont)
         MM2.grid(row=0,column = 1,padx=3)
         
-        entry3 = tk.Entry(entry)
+        entry3 = tk.Entry(entry,font=controller.defaultFont)
 
         label1.grid(row = 0, column =0,pady=14,sticky="e")
         label2.grid(row = 1, column =0,pady=14,sticky="e")
@@ -888,10 +892,10 @@ class DateTimeSetting(tk.Frame):
         entry3.grid(row = 2, column =1,padx = 80)
         time2.grid(row = 3, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Start", command = lambda : self.start_recording(controller,HH1,MM1,HH2,MM2,entry1,entry3),image=controller.start,compound="right")
-        backButton = ttk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,TMSConfig),image=controller.back,compound="left")
-        date1 = ttk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3)
-        date2 = ttk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3)
+        nextButton = tk.Button(buttons, text = "Start", command = lambda : self.start_recording(controller,HH1,MM1,HH2,MM2,entry1,entry3),image=controller.start,compound="right",font=controller.buttonFont)
+        backButton = tk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,TMSConfig),image=controller.back,compound="left",font=controller.buttonFont)
+        date1 = tk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3,font=controller.buttonFont)
+        date2 = tk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3,font=controller.buttonFont)
 
         backButton.grid(column = 0,padx = 10)
         nextButton.grid(row = 0,column = 1)
@@ -969,7 +973,7 @@ class MainScreen(tk.Frame):
         self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
         self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
         self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
-        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        self.grid_rowconfigure(2,weight=1,minsize = MINSIZEROW2)
         self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
 
         title = tk.Label(self, text="Statistics", font=controller.headerFont)
@@ -1016,15 +1020,15 @@ class MainScreen(tk.Frame):
         grid2.pack(pady=20)
 
         temp = tk.Label(grid2, text = "TEMPERATURE :",font = controller.headerFont)
-        mxtemp = tk.Label(grid2, text = "MAX TEMPERATURE :",font = controller.defaultFont)
-        mntemp = tk.Label(grid2, text = "MIN TEMPERATURE :",font = controller.defaultFont)
+        mxtemp = tk.Label(grid2, text = "MAX TEMPERATURE :",font = controller.headerFont)
+        mntemp = tk.Label(grid2, text = "MIN TEMPERATURE :",font = controller.headerFont)
 
         t1 = tk.Label(grid2, text = 0,font = controller.headerFont)
-        t2 = tk.Label(grid2, text = 0,font = controller.defaultFont)
-        t3 = tk.Label(grid2, text = 0,font = controller.defaultFont)
+        t2 = tk.Label(grid2, text = 0,font = controller.headerFont)
+        t3 = tk.Label(grid2, text = 0,font = controller.headerFont)
         degree1 = tk.Label(grid2, text = "*C",font = controller.headerFont)
-        degree2 = tk.Label(grid2, text = "*C",font = controller.defaultFont)
-        degree3 = tk.Label(grid2, text = "*C",font = controller.defaultFont)
+        degree2 = tk.Label(grid2, text = "*C",font = controller.headerFont)
+        degree3 = tk.Label(grid2, text = "*C",font = controller.headerFont)
 
         temp.grid(row=0,column=0,sticky="e",pady=10)
         mxtemp.grid(row=1,column=0,sticky="e",pady=10)
@@ -1038,7 +1042,7 @@ class MainScreen(tk.Frame):
 
 
 
-        menuButton = ttk.Button(buttons, text = "Menu", command = lambda :self.local_show_frame(controller),image=controller.menu,compound="left")
+        menuButton = tk.Button(buttons, text = "Menu", command = lambda :self.local_show_frame(controller),image=controller.menu,compound="left",font=controller.buttonFont)
 
         menuButton.grid()
 
@@ -1077,11 +1081,11 @@ class Menu(tk.Frame):
         # returnToMenu = True
         # print returnToMenu
 
-        button1 = tk.Button(display, text = "TMS Configuration", command = lambda : self.local_show_frame(controller),width=30)
-        button2 = tk.Button(display, text = "Export", command = lambda:inputBox(),width=30)
-        button3 = tk.Button(display, text = "View Output", command = lambda : controller.show_frame(Output),width=30)
-        button4 = tk.Button(display, text = "Settings", command = lambda : controller.show_frame(Settings),width=30)
-        button5 = tk.Button(display, text = "Change Password", command = lambda : controller.show_frame(PasswordChange),width=30)
+        button1 = tk.Button(display, text = "TMS Configuration", command = lambda : self.local_show_frame(controller),width=30,font=controller.buttonFont)
+        button2 = tk.Button(display, text = "Export", command = lambda:inputBox(),width=30,font=controller.buttonFont)
+        button3 = tk.Button(display, text = "View Output", command = lambda : controller.show_frame(Output),width=30,font=controller.buttonFont)
+        button4 = tk.Button(display, text = "Settings", command = lambda : controller.show_frame(Settings),width=30,font=controller.buttonFont)
+        button5 = tk.Button(display, text = "Change Password", command = lambda : controller.show_frame(PasswordChange),width=30,font=controller.buttonFont)
 
         button1.pack(pady=10)
         button2.pack(side = "bottom",pady=10)
@@ -1090,7 +1094,7 @@ class Menu(tk.Frame):
         button5.pack(side = "bottom",pady=10)
 
 
-        backButton = ttk.Button(buttons, text = "Back", command = lambda : controller.show_frame(MainScreen),image=controller.back,compound="left")
+        backButton = tk.Button(buttons, text = "Back", command = lambda : controller.show_frame(MainScreen),image=controller.back,compound="left",font=controller.buttonFont)
 
         backButton.grid()
 
@@ -1127,8 +1131,8 @@ class Settings(tk.Frame):
         
         x = tk.StringVar()
         y = tk.StringVar()
-        entry1 = tk.Entry(entry,textvariable=x)
-        entry2 = tk.Entry(entry,textvariable=y)
+        entry1 = tk.Entry(entry,textvariable=x,font=controller.defaultFont)
+        entry2 = tk.Entry(entry,textvariable=y,font=controller.defaultFont)
         x.set(MAXIMUM)
         y.set(MINIMUM)
 
@@ -1144,8 +1148,8 @@ class Settings(tk.Frame):
         entry1.grid(row = 0, column =1,padx = 80)
         entry2.grid(row = 1, column =1,padx = 80)
 
-        nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2),image=controller.save,compound="left")
-        backButton = ttk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller,x,y),image=controller.back,compound="left")
+        nextButton = tk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2),image=controller.save,compound="left",font=controller.buttonFont)
+        backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller,x,y),image=controller.back,compound="left",font=controller.buttonFont)
 
         backButton.grid(row=0,column=0,padx=10)
         nextButton.grid(row=0,column=1)
@@ -1210,35 +1214,35 @@ class Output(tk.Frame):
         label4 = tk.Label(entry, text = "END TIME :",font=controller.defaultFont)
         label5 = tk.Label(entry, text = "TIME INTERVAL :",font=controller.defaultFont)
 
-        entry1 = tk.Entry(entry)
+        entry1 = tk.Entry(entry,font=controller.defaultFont)
 
         time1 = tk.Frame(entry)
 
         hh1 = tk.StringVar(time1)
         hh1.set(HHLIST[0])
-        HH1 = ttk.Combobox(time1, textvariable = hh1, values=HHLIST,width=7)
+        HH1 = ttk.Combobox(time1, textvariable = hh1, values=HHLIST,width=8,font=controller.defaultFont)
         HH1.grid(row=0,column=0,padx=3)
         
         mm1 = tk.StringVar(time1)
         mm1.set(MMLIST[0])
-        MM1 = ttk.Combobox(time1, textvariable = mm1, values=MMLIST,width=7)
+        MM1 = ttk.Combobox(time1, textvariable = mm1, values=MMLIST,width=8,font=controller.defaultFont)
         MM1.grid(row=0,column = 1,padx=3)
                 
-        entry3 = tk.Entry(entry)
+        entry3 = tk.Entry(entry,font=controller.defaultFont)
 
         time2 = tk.Frame(entry)
         
         hh2 = tk.StringVar(time2)
         hh2.set(HHLIST[0])
-        HH2 = ttk.Combobox(time2, textvariable = hh2, values=HHLIST,width=7)
+        HH2 = ttk.Combobox(time2, textvariable = hh2, values=HHLIST,width=8,font=controller.defaultFont)
         HH2.grid(row=0,column=0,padx=3)
         
         mm2 = tk.StringVar(time2)
         mm2.set(MMLIST[0])
-        MM2 = ttk.Combobox(time2, textvariable = mm2, values=MMLIST,width=7)
+        MM2 = ttk.Combobox(time2, textvariable = mm2, values=MMLIST,width=8,font=controller.defaultFont)
         MM2.grid(row=0,column = 1,padx=3)
 
-        entry5 = tk.Entry(entry)
+        entry5 = tk.Entry(entry,font=controller.defaultFont)
         
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
@@ -1256,10 +1260,10 @@ class Output(tk.Frame):
 
         entry5.bind("<FocusOut>",controller.close_keyboard)
 
-        nextButton = ttk.Button(buttons, text = "Output", command = lambda : self.validate(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.output,compound="left")
-        backButton = ttk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.back,compound="left")
-        date1 = ttk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3)
-        date2 = ttk.Button(entry, text = ".", command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3)
+        nextButton = tk.Button(buttons, text = "Output", command = lambda : self.validate(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.output,compound="left",font=controller.buttonFont)
+        backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.back,compound="left",font=controller.buttonFont)
+        date1 = tk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3,font=controller.buttonFont)
+        date2 = tk.Button(entry, text = ".", command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3,font=controller.buttonFont)
 
         backButton.grid(column = 0,padx = 10)
         nextButton.grid(row = 0,column = 1)
@@ -1418,9 +1422,9 @@ class ViewOutput(tk.Frame):
         outputFrame.grid(row=2,column=0,pady=ENTRYFRAMEPADY,padx=35)
 
 
-        backButton = ttk.Button(buttons, text = "Menu", command = lambda : controller.show_frame(Menu),image=controller.menu,compound="left")
-        bButton = ttk.Button(buttons,  command = lambda : self.backPage(controller,out,bButton,nButton),width = 3,state="disabled",image=controller.back,compound="left")
-        nButton = ttk.Button(buttons, command = lambda : self.nextPage(controller,out,bButton,nButton), width = 3,image=controller.next,compound="right")
+        backButton = tk.Button(buttons, text = "Menu", command = lambda : controller.show_frame(Menu),image=controller.menu,compound="left",font=controller.buttonFont)
+        bButton = tk.Button(buttons,  command = lambda : self.backPage(controller,out,bButton,nButton),width = 3,state="disabled",image=controller.back,compound="left",font=controller.buttonFont)
+        nButton = tk.Button(buttons, command = lambda : self.nextPage(controller,out,bButton,nButton), width = 3,image=controller.next,compound="right",font=controller.buttonFont)
         # self.checkNextBack(controller,bButton,nButton)
 
         bButton.grid(padx = 5,row=0,column=0)
@@ -1498,7 +1502,7 @@ class Login(tk.Frame):
         
         #entry1 = tk.Entry(entry)
         self.passw = tk.StringVar()
-        entry2 = tk.Entry(entry,show="*",textvariable=self.passw)
+        entry2 = tk.Entry(entry,show="*",textvariable=self.passw,font=controller.defaultFont)
 
         #label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
@@ -1513,7 +1517,7 @@ class Login(tk.Frame):
         entry2.bind("<FocusOut>",controller.close_keyboard)
 
         # backButton = ttk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller))
-        nextButton = ttk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons),image=controller.next,compound="right")
+        nextButton = tk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons),image=controller.next,compound="right",font=controller.buttonFont)
 
         # backButton.grid(row=0 ,column=0,padx=10)
         nextButton.grid(row=0 ,column=1)
@@ -1541,8 +1545,8 @@ class Login(tk.Frame):
         	if returnToMenu:
         		controller.show_frame(Menu)
         	else:
-        		backButton = ttk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left")
-        		nextButton = ttk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons),image=controller.next,compound="right")
+        		backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
+        		nextButton = tk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons),image=controller.next,compound="right",font=controller.buttonFont)
         		backButton.grid(row=0 ,column=0,padx=10)
         		nextButton.grid(row=0 ,column=1)
 	    		controller.show_frame(TMSConfig)
@@ -1583,8 +1587,8 @@ class PasswordChange(tk.Frame):
         
         self.passw1 = tk.StringVar()
         self.passw2 = tk.StringVar()
-        entry1 = tk.Entry(entry,show="*",textvariable=self.passw1)
-        entry2 = tk.Entry(entry,show="*",textvariable=self.passw2)
+        entry1 = tk.Entry(entry,show="*",textvariable=self.passw1,font=controller.defaultFont)
+        entry2 = tk.Entry(entry,show="*",textvariable=self.passw2,font=controller.defaultFont)
 
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
@@ -1598,8 +1602,8 @@ class PasswordChange(tk.Frame):
         entry1.bind("<FocusOut>",controller.close_keyboard)
         entry2.bind("<FocusOut>",controller.close_keyboard)
 
-        backButton = ttk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left")
-        nextButton = ttk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller),image=controller.save,compound="left")
+        backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
+        nextButton = tk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller),image=controller.save,compound="left",font=controller.buttonFont)
 
         backButton.grid(row=0,column=0,padx=10)
         nextButton.grid(row=0,column=1)
