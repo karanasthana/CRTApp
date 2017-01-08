@@ -262,9 +262,9 @@ def recorder(num = 1):
     global app
     global t1,t2,t3,date,times,rrr,sss,ddd,rrrr,ssss,div,mx,mn,prev_date
     if num is 1:
-        rrrr.configure(text=rrr.upper())
-        ssss.configure(text=sss.upper())
-        div.configure(text=ddd.upper())
+        rrrr.configure(text=rrr)
+        ssss.configure(text=sss)
+        div.configure(text=ddd)
         mx=-5
         mn=85
         prev_date=""
@@ -550,6 +550,7 @@ class CRTApp(tk.Tk):
         self.rec = tk.PhotoImage(file=HOMEDIR+"/img/rec.gif")
         # image = Image.open("img/nrec.png")
         self.nrec = tk.PhotoImage(file=HOMEDIR+"/img/nrec.gif")
+        self.cal = tk.PhotoImage(file=HOMEDIR+"/img/cal.gif")
         #self.wm_geometry("800x480")
         # self.attributes("-zoomed",True)
         # self.attributes("-fullscreen",True)
@@ -581,7 +582,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        time.sleep(3)
+        time.sleep(0)
         self.logo.place_forget()
         self.show_frame(Login)
 
@@ -734,6 +735,10 @@ class TMSConfig(tk.Frame):
         entry3 = tk.Entry(entry,textvariable=self.y,font=controller.defaultFont)
         entry4 = tk.Entry(entry,textvariable=self.z,font=controller.defaultFont)
 
+        self.w.trace("w", lambda x,y,z:self.autocapitalize(self.w))
+        self.x.trace("w", lambda x,y,z:self.autocapitalize(self.x))
+        self.y.trace("w", lambda x,y,z:self.autocapitalize(self.y))
+        # self.z.trace("w", lambda x,y,z:self.autocapitalize(self.z))
         # entry1.focus_set()
         entry1.bind("<FocusIn>",controller.call_keyboard)
         # entry2.focus_set()
@@ -745,6 +750,7 @@ class TMSConfig(tk.Frame):
         entry2.bind("<FocusOut>",controller.close_keyboard)
         entry3.bind("<FocusOut>",controller.close_keyboard)
         entry4.bind("<FocusOut>",controller.close_keyboard)
+        # entry1.bind("<KeyPress>", self.autocapitalize)
 
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
@@ -825,6 +831,10 @@ class TMSConfig(tk.Frame):
 
     	controller.show_frame(Menu)
 
+    def autocapitalize(self,var):
+
+        var.set(var.get().upper())
+
 
 class DateTimeSetting(tk.Frame):
 
@@ -894,8 +904,8 @@ class DateTimeSetting(tk.Frame):
 
         nextButton = tk.Button(buttons, text = "Start", command = lambda : self.start_recording(controller,HH1,MM1,HH2,MM2,entry1,entry3),image=controller.start,compound="right",font=controller.buttonFont)
         backButton = tk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,TMSConfig),image=controller.back,compound="left",font=controller.buttonFont)
-        date1 = tk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3,font=controller.buttonFont)
-        date2 = tk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3,font=controller.buttonFont)
+        date1 = tk.Button(entry, image=controller.cal, command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=30,height=30)
+        date2 = tk.Button(entry, image=controller.cal, command = lambda:controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=30,height=30)
 
         backButton.grid(column = 0,padx = 10)
         nextButton.grid(row = 0,column = 1)
@@ -1262,8 +1272,8 @@ class Output(tk.Frame):
 
         nextButton = tk.Button(buttons, text = "Output", command = lambda : self.validate(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.output,compound="left",font=controller.buttonFont)
         backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.back,compound="left",font=controller.buttonFont)
-        date1 = tk.Button(entry, text = ".", command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=3,font=controller.buttonFont)
-        date2 = tk.Button(entry, text = ".", command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=3,font=controller.buttonFont)
+        date1 = tk.Button(entry, image=controller.cal, command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=30,height=30)
+        date2 = tk.Button(entry, image=controller.cal, command = lambda :controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=30, height=30)
 
         backButton.grid(column = 0,padx = 10)
         nextButton.grid(row = 0,column = 1)
