@@ -93,6 +93,10 @@ def infoBox(msg):
     tkMessageBox.showinfo("Done",msg)
     return 1
 
+def killkeyboard():
+
+	os.system("killall matchbox-keyboard")
+
 def center(x):
     x.update_idletasks()
     w=x.winfo_screenwidth()
@@ -142,8 +146,8 @@ def inputBox():
 
     entry = tk.Entry(ibox,width=30,textvariable=v,font=defaultFont)
     entry.grid(row=1,column=0,padx=10)
-    entry.bind("<FocusIn>",lambda x: subprocess.Popen("matchbox-keyboard"))
-    entry.bind("<FocusOut>",lambda x: os.system("killall matchbox-keyboard"))
+    entry.bind("<Button-1>",lambda x: subprocess.Popen("matchbox-keyboard"))
+    entry.bind("<Leave>",lambda x: os.system("killall matchbox-keyboard"))
     # v.set("5")
 
     ti = tk.StringVar(ibox)
@@ -568,7 +572,6 @@ class CRTApp(tk.Tk):
         self.headerFont = tkFont.Font(family = "Helvetica", size = 16, weight = "bold")
         self.buttonFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
 
-        # bigfont = tkFont.Font(family="Helvetica",size=12,weight="bold")
         self.option_add("*TCombobox*Listbox*Font", self.defaultFont)
 
         # container.grid_rowconfigure(0, weight=1)
@@ -702,60 +705,78 @@ class TMSConfig(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
-        self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
-        self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        f = tk.Frame(self)
+
+        f.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        f.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        f.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
         # self.grid_rowconfigure(0,weight=1,minsize = 80)
-        self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
-        self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
+        f.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        f.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
+        # self.config(borderwidth=3,relief=tk.GROOVE)
         
-        title = tk.Label(self, text="TMS Configuration", font=controller.headerFont)
-        title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
+        self.title = tk.Label(f, text="TMS Configuration", font=controller.headerFont)
+        self.title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
 
-        separator = ttk.Separator(self,orient=tk.HORIZONTAL)
-        separator.grid(row=1,column=0,columnspan=3,sticky="ew")
+        self.separator = ttk.Separator(f,orient=tk.HORIZONTAL)
+        self.separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
-        entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
+        self.entry = tk.Frame(f)
+        self.entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
 
-        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
+        self.buttons = tk.Frame(f)#, borderwidth=5, relief=tk.GROOVE)
+        self.buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
 
-        label1 = tk.Label(entry, text = "Railway Name :",font = controller.defaultFont)
-        label2 = tk.Label(entry, text = "Division Name :",font=controller.defaultFont)
-        label3 = tk.Label(entry, text = "Station Name :",font=controller.defaultFont)
-        label4 = tk.Label(entry, text = "Model Number :", font=controller.defaultFont)        
+        label1 = tk.Label(self.entry, text = "Railway Name :",font = controller.defaultFont)
+        label2 = tk.Label(self.entry, text = "Division Name :",font=controller.defaultFont)
+        label3 = tk.Label(self.entry, text = "Station Name :",font=controller.defaultFont)
+        label4 = tk.Label(self.entry, text = "Model Number :", font=controller.defaultFont)        
         
         self.w = tk.StringVar()
         self.x = tk.StringVar()
         self.y = tk.StringVar()
         self.z = tk.StringVar()
-        entry1 = tk.Entry(entry,textvariable=self.w,font=controller.defaultFont)
-        entry2 = tk.Entry(entry,textvariable=self.x,font=controller.defaultFont)
-        entry3 = tk.Entry(entry,textvariable=self.y,font=controller.defaultFont)
-        entry4 = tk.Entry(entry,textvariable=self.z,font=controller.defaultFont)
+        entry1 = tk.Entry(self.entry,textvariable=self.w,font=controller.defaultFont)
+        entry2 = tk.Entry(self.entry,textvariable=self.x,font=controller.defaultFont)
+        entry3 = tk.Entry(self.entry,textvariable=self.y,font=controller.defaultFont)
+        entry4 = tk.Entry(self.entry,textvariable=self.z,font=controller.defaultFont)
 
         self.w.trace("w", lambda x,y,z:self.autocapitalize(self.w))
         self.x.trace("w", lambda x,y,z:self.autocapitalize(self.x))
         self.y.trace("w", lambda x,y,z:self.autocapitalize(self.y))
         # self.z.trace("w", lambda x,y,z:self.autocapitalize(self.z))
-        # entry1.focus_set()
-        entry1.bind("<FocusIn>",controller.call_keyboard)
-        # entry2.focus_set()
-        entry2.bind("<FocusIn>",controller.call_keyboard)
-        entry3.bind("<FocusIn>",controller.call_keyboard)
-        entry4.bind("<FocusIn>",controller.call_keyboard)
 
-        entry1.bind("<FocusOut>",controller.close_keyboard)
-        entry2.bind("<FocusOut>",controller.close_keyboard)
-        entry3.bind("<FocusOut>",controller.close_keyboard)
-        entry4.bind("<FocusOut>",controller.close_keyboard)
+        # entry1.bind("<Leave>",controller.close_keyboard)
+        # entry2.bind("<Leave>",controller.close_keyboard)
+        # entry3.bind("<Leave>",controller.close_keyboard)
+        # entry4.bind("<Leave>",controller.close_keyboard)
+
+        # # entry1.focus_set()
+        # entry1.bind("<Button-1>",controller.call_keyboard)
+        # # entry2.focus_set()
+        # entry2.bind("<Button-1>",controller.call_keyboard)
+        # entry3.bind("<Button-1>",controller.call_keyboard)
+        # entry4.bind("<Button-1>",controller.call_keyboard)
+
+        # f.bind("<Button-1>",controller.close_keyboard)
+        # entry1.bind("<FocusIn>",self.adjust)
+        entry1.bind("<Button-1>",self.adjust)
+        entry2.bind("<Button-1>",self.adjust)
+        entry3.bind("<Button-1>",self.adjust)
+        entry4.bind("<Button-1>",self.adjust)
+
+        # f.bind("<OnClick>", controller.close_keyboard)
+
+        # entry1.bind("<Leave>",self.readjust)
+        # entry2.bind("<Leave>",self.readjust)
+        # entry3.bind("<Leave>",self.readjust)
+        # entry4.bind("<Leave>",self.readjust)
         # entry1.bind("<KeyPress>", self.autocapitalize)
 
-        label1.grid(row = 0, column =0,pady=10,sticky="e")
-        label2.grid(row = 1, column =0,pady=10,sticky="e")
-        label3.grid(row = 2, column =0,pady=10,sticky="e")
-        label4.grid(row = 3, column =0,pady=10,sticky="e")
+        label1.grid(row = 0, column =0,pady=7,sticky="e")
+        label2.grid(row = 1, column =0,pady=7,sticky="e")
+        label3.grid(row = 2, column =0,pady=7,sticky="e")
+        label4.grid(row = 3, column =0,pady=7,sticky="e")
 
         entry1.grid(row = 0, column =1,padx = 80)
         entry2.grid(row = 1, column =1,padx = 80)
@@ -763,10 +784,85 @@ class TMSConfig(tk.Frame):
         entry4.grid(row = 3, column =1,padx = 80)
 
         
-        nextButton = tk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2,entry3,entry4,buttons)
+        nextButton = tk.Button(self.buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2,entry3,entry4,self.buttons)
             ,image=controller.save,compound="left",font=controller.buttonFont)
 
         nextButton.grid(row=0,column=0)
+        f.grid()
+        
+        # # print self.grid_size()
+        # # pcalender.__init__("Anupam")
+        # # subprocess.Popen("killall matchbox-keyboard")
+
+        # f = tk.Frame(self,bd=2,relief=tk.GROOVE)
+
+        # self.grid_columnconfigure(0,weight=1,minsize = MINSIZECOLUMN)
+        # self.grid_columnconfigure(1,weight=1,minsize = MINSIZECOLUMN)
+        # self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
+        # # self.grid_rowconfigure(0,weight=1,minsize = 80)
+        # self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
+        # self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
+        # # self.config(borderwidth=3,relief=tk.GROOVE)
+        
+        # title = tk.Label(self, text="TMS Configuration", font=controller.headerFont)
+        # title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
+
+        # separator = ttk.Separator(self,orient=tk.HORIZONTAL)
+        # separator.grid(row=1,column=0,columnspan=3,sticky="ew")
+
+        # entry = tk.Frame(self)
+        # entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
+
+        # buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
+        # buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
+
+        # label1 = tk.Label(entry, text = "Railway Name :",font = controller.defaultFont)
+        # label2 = tk.Label(entry, text = "Division Name :",font=controller.defaultFont)
+        # label3 = tk.Label(entry, text = "Station Name :",font=controller.defaultFont)
+        # label4 = tk.Label(entry, text = "Model Number :", font=controller.defaultFont)        
+        
+        # self.w = tk.StringVar()
+        # self.x = tk.StringVar()
+        # self.y = tk.StringVar()
+        # self.z = tk.StringVar()
+        # entry1 = tk.Entry(entry,textvariable=self.w,font=controller.defaultFont)
+        # entry2 = tk.Entry(entry,textvariable=self.x,font=controller.defaultFont)
+        # entry3 = tk.Entry(entry,textvariable=self.y,font=controller.defaultFont)
+        # entry4 = tk.Entry(entry,textvariable=self.z,font=controller.defaultFont)
+
+        # self.w.trace("w", lambda x,y,z:self.autocapitalize(self.w))
+        # self.x.trace("w", lambda x,y,z:self.autocapitalize(self.x))
+        # self.y.trace("w", lambda x,y,z:self.autocapitalize(self.y))
+        # # self.z.trace("w", lambda x,y,z:self.autocapitalize(self.z))
+        # # entry1.focus_set()
+        # entry1.bind("<FocusIn>",controller.call_keyboard)
+        # # entry2.focus_set()
+        # entry2.bind("<FocusIn>",controller.call_keyboard)
+        # entry3.bind("<FocusIn>",controller.call_keyboard)
+        # entry4.bind("<FocusIn>",controller.call_keyboard)
+
+        # entry1.bind("<FocusOut>",controller.close_keyboard)
+        # entry2.bind("<FocusOut>",controller.close_keyboard)
+        # entry3.bind("<FocusOut>",controller.close_keyboard)
+        # entry4.bind("<FocusOut>",controller.close_keyboard)
+        # # entry1.bind("<KeyPress>", self.autocapitalize)
+
+        # label1.grid(row = 0, column =0,pady=10,sticky="e")
+        # label2.grid(row = 1, column =0,pady=10,sticky="e")
+        # label3.grid(row = 2, column =0,pady=10,sticky="e")
+        # label4.grid(row = 3, column =0,pady=10,sticky="e")
+
+        # entry1.grid(row = 0, column =1,padx = 80)
+        # entry2.grid(row = 1, column =1,padx = 80)
+        # entry3.grid(row = 2, column =1,padx = 80)
+        # entry4.grid(row = 3, column =1,padx = 80)
+
+        
+        # nextButton = tk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2,entry3,entry4,buttons)
+        #     ,image=controller.save,compound="left",font=controller.buttonFont)
+
+        # nextButton.grid(row=0,column=0)
+        # f.grid()
         # print self.grid_size()
         # pcalender.__init__("Anupam")
         # subprocess.Popen("killall matchbox-keyboard")
@@ -776,6 +872,18 @@ class TMSConfig(tk.Frame):
         global sss,rrr,ddd,mmm
 
         flag = 0
+
+        # os.system("killall matchbox-keyboard")
+
+        os.system("killall matchbox-keyboard")
+    	self.entry.grid_forget()
+    	self.buttons.grid_forget()
+    	self.title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
+    	self.separator.grid(row=1,column=0,columnspan=3,sticky="ew")
+    	self.entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
+    	self.buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
+
+        killkeyboard()
 
         w=mn.get()
         x=rr.get()
@@ -814,8 +922,8 @@ class TMSConfig(tk.Frame):
                 controller.show_frame(Menu)
             else:
             	# buttons.config(padx=BUTTONFRAMEPADX)
-            	backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
-            	nextButton = tk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller,rr,dd,ss,mn,buttons),image=controller.save,compound="left",font=controller.buttonFont)
+            	backButton = tk.Button(self.buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
+            	nextButton = tk.Button(self.buttons, text = "Save", command = lambda : self.local_show_frame(controller,rr,dd,ss,mn,self.buttons),image=controller.save,compound="left",font=controller.buttonFont)
             	backButton.grid(row=0,column=0)
             	nextButton.grid(row=0,column=1,padx=10)
             	controller.show_frame(DateTimeSetting)
@@ -823,6 +931,14 @@ class TMSConfig(tk.Frame):
     def backPressed(self,controller):
 
     	global sss,rrr,ddd,mmm
+
+    	os.system("killall matchbox-keyboard")
+    	self.entry.grid_forget()
+    	self.buttons.grid_forget()
+    	self.title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
+    	self.separator.grid(row=1,column=0,columnspan=3,sticky="ew")
+    	self.entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
+    	self.buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
 
     	self.w.set(rrr)
     	self.x.set(ddd)
@@ -834,6 +950,26 @@ class TMSConfig(tk.Frame):
     def autocapitalize(self,var):
 
         var.set(var.get().upper())
+
+    def adjust(self,event):
+
+    	subprocess.Popen("matchbox-keyboard")
+    	self.title.grid_forget()
+        self.separator.grid_forget()
+        self.entry.grid_forget()
+        self.buttons.grid_forget()
+        self.entry.grid(row=0, column=0, pady=0,padx=ENTRYFRAMEPADX)
+        self.buttons.grid(row=1, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w",pady=ENTRYFRAMEPADY-30)
+
+    def readjust(self, event):
+
+    	os.system("killall matchbox-keyboard")
+    	self.entry.grid_forget()
+    	self.buttons.grid_forget()
+    	self.title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
+    	self.separator.grid(row=1,column=0,columnspan=3,sticky="ew")
+    	self.entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
+    	self.buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
 
 
 class DateTimeSetting(tk.Frame):
@@ -915,6 +1051,9 @@ class DateTimeSetting(tk.Frame):
     def local_show_frame(self,controller,f):
 
 		global calframe
+
+		killkeyboard()
+		
 		if calframe :
 			calframe.grid_forget()
 		controller.show_frame(f)
@@ -922,6 +1061,9 @@ class DateTimeSetting(tk.Frame):
     def start_recording(self,controller,hh1,mm1,hh2,mm2,cdate,sdate):
 
         global c,d,f
+
+        killkeyboard()
+
     	a = hh1.get()
     	b = mm1.get()
     	c = hh2.get()
@@ -1059,6 +1201,9 @@ class MainScreen(tk.Frame):
     def local_show_frame(self,controller):
 
         global returnToMenu
+
+        killkeyboard()
+
         returnToMenu = True
 
         controller.show_frame(Login)
@@ -1110,6 +1255,8 @@ class Menu(tk.Frame):
 
     def local_show_frame(self, controller):
 
+        killkeyboard()
+
         controller.show_frame(TMSConfig)
 
 
@@ -1131,7 +1278,7 @@ class Settings(tk.Frame):
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
+        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX,sticky="n")
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
         buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
@@ -1146,11 +1293,11 @@ class Settings(tk.Frame):
         x.set(MAXIMUM)
         y.set(MINIMUM)
 
-        entry1.bind("<FocusIn>",controller.call_keyboard)
-        entry2.bind("<FocusIn>",controller.call_keyboard)
+        entry1.bind("<Button-1>",controller.call_keyboard)
+        entry2.bind("<Button-1>",controller.call_keyboard)
 
-        entry1.bind("<FocusOut>",controller.close_keyboard)
-        entry2.bind("<FocusOut>",controller.close_keyboard)
+        entry1.bind("<Leave>",controller.close_keyboard)
+        entry2.bind("<Leave>",controller.close_keyboard)
 
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
@@ -1165,7 +1312,11 @@ class Settings(tk.Frame):
         nextButton.grid(row=0,column=1)
 
     def local_show_frame(self,controller,Entry1,Entry2):
+
         global MAXIMUM,MINIMUM
+        
+        killkeyboard()
+
         xx=Entry1.get()
         yy=Entry2.get()
         checkmx = re.search("(^[\-]{0,1}[0-9]+[\.][0-9]$)|(^[\-]{0,1}[0-9]+$)",xx)
@@ -1187,6 +1338,9 @@ class Settings(tk.Frame):
     def backPressed(self,controller,Entry1,Entry2):
 
     	global MAXIMUM,MINIMUM
+    	
+    	killkeyboard()
+
     	Entry1.set(MAXIMUM)
     	Entry2.set(MINIMUM)
     	x = Entry1.get()
@@ -1254,21 +1408,21 @@ class Output(tk.Frame):
 
         entry5 = tk.Entry(entry,font=controller.defaultFont)
         
-        label1.grid(row = 0, column =0,pady=10,sticky="e")
-        label2.grid(row = 1, column =0,pady=10,sticky="e")
-        label3.grid(row = 2, column =0,pady=10,sticky="e")
-        label4.grid(row = 3, column =0,pady=10,sticky="e")
-        label5.grid(row = 4, column =0,pady=10,sticky="e")
+        label5.grid(row = 0, column =0,pady=10,sticky="e")
+        label1.grid(row = 1, column =0,pady=10,sticky="e")
+        label2.grid(row = 2, column =0,pady=10,sticky="e")
+        label3.grid(row = 3, column =0,pady=10,sticky="e")
+        label4.grid(row = 4, column =0,pady=10,sticky="e")
 
-        entry1.grid(row = 0, column =1,padx = 80)
-        time1.grid(row = 1, column =1,padx = 80)
-        entry3.grid(row = 2, column =1,padx = 80)
-        time2.grid(row = 3, column =1,padx = 80)
-        entry5.grid(row = 4, column =1,padx = 80)
+        entry5.grid(row = 0, column =1,padx = 80)
+        entry1.grid(row = 1, column =1,padx = 80)
+        time1.grid(row = 2, column =1,padx = 80)
+        entry3.grid(row = 3, column =1,padx = 80)
+        time2.grid(row = 4, column =1,padx = 80)
 
-        entry5.bind("<FocusIn>",controller.call_keyboard)
+        entry5.bind("<Button-1>",controller.call_keyboard)
 
-        entry5.bind("<FocusOut>",controller.close_keyboard)
+        entry5.bind("<Leave>",controller.close_keyboard)
 
         nextButton = tk.Button(buttons, text = "Output", command = lambda : self.validate(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.output,compound="left",font=controller.buttonFont)
         backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.back,compound="left",font=controller.buttonFont)
@@ -1277,11 +1431,12 @@ class Output(tk.Frame):
 
         backButton.grid(column = 0,padx = 10)
         nextButton.grid(row = 0,column = 1)
-        date1.grid(row=0,column=2,sticky="w")
-        date2.grid(row=2,column=2,sticky="w")
+        date1.grid(row=1,column=2,sticky="w")
+        date2.grid(row=3,column=2,sticky="w")
 
     def backPressed(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
 
+        killkeyboard()
         sdate.delete(0,"end")
     	edate.delete(0,"end")
     	intr.delete(0,"end")
@@ -1300,6 +1455,7 @@ class Output(tk.Frame):
 
     def validate(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
 
+        killkeyboard()
         axx = hh1.get()
         b = mm1.get()
         c = hh2.get()
@@ -1521,10 +1677,10 @@ class Login(tk.Frame):
         entry2.grid(row = 1, column =1,padx = 80)
 
         #entry1.bind("<FocusIn>",controller.call_keyboard)
-        entry2.bind("<FocusIn>",controller.call_keyboard)
+        entry2.bind("<Button-1>",controller.call_keyboard)
 
         #entry1.bind("<FocusOut>",controller.close_keyboard)
-        entry2.bind("<FocusOut>",controller.close_keyboard)
+        entry2.bind("<Leave>",controller.close_keyboard)
 
         # backButton = ttk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller))
         nextButton = tk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons),image=controller.next,compound="right",font=controller.buttonFont)
@@ -1535,6 +1691,8 @@ class Login(tk.Frame):
     def local_show_frame(self,controller,buttons):
 
         global sss,rrr,ddd
+
+        killkeyboard()
 
         flag = 0
 
@@ -1580,17 +1738,17 @@ class PasswordChange(tk.Frame):
         self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
         self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
         
-        title = tk.Label(self, text="Login", font=controller.headerFont)
+        title = tk.Label(self, text="Change Password", font=controller.headerFont)
         title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
 
         separator = ttk.Separator(self,orient=tk.HORIZONTAL)
         separator.grid(row=1,column=0,columnspan=3,sticky="ew")
 
         entry = tk.Frame(self)
-        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
+        entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX,sticky="n")
 
-        buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
-        buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40,pady=20, columnspan=3,sticky="w")
+        self.buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
+        self.buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40,pady=20, columnspan=3,sticky="w")
 
         label1 = tk.Label(entry, text = "New Password :",font = controller.defaultFont)
         label2 = tk.Label(entry, text = "Confirm Password :",font=controller.defaultFont)       
@@ -1606,14 +1764,14 @@ class PasswordChange(tk.Frame):
         entry1.grid(row = 0, column =1,padx = 80)
         entry2.grid(row = 1, column =1,padx = 80)
 
-        entry1.bind("<FocusIn>",controller.call_keyboard)
-        entry2.bind("<FocusIn>",controller.call_keyboard)
+        entry1.bind("<Button-1>",controller.call_keyboard)
+        entry2.bind("<Button-1>",controller.call_keyboard)
 
-        entry1.bind("<FocusOut>",controller.close_keyboard)
-        entry2.bind("<FocusOut>",controller.close_keyboard)
+        entry1.bind("<Leave>",controller.close_keyboard)
+        entry2.bind("<Leave>",controller.close_keyboard)
 
-        backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
-        nextButton = tk.Button(buttons, text = "Save", command = lambda : self.local_show_frame(controller),image=controller.save,compound="left",font=controller.buttonFont)
+        backButton = tk.Button(self.buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
+        nextButton = tk.Button(self.buttons, text = "Save", command = lambda : self.local_show_frame(controller),image=controller.save,compound="left",font=controller.buttonFont)
 
         backButton.grid(row=0,column=0,padx=10)
         nextButton.grid(row=0,column=1)
@@ -1622,6 +1780,8 @@ class PasswordChange(tk.Frame):
     def local_show_frame(self,controller):
 
         global sss,rrr,ddd
+
+        killkeyboard()
 
         flag = 0
 
@@ -1646,6 +1806,8 @@ class PasswordChange(tk.Frame):
         	errorBox("Invalid Input")
 
     def backPressed(self,controller):
+
+    	killkeyboard()
     	
     	self.passw1.set("")
         self.passw2.set("")
