@@ -557,7 +557,7 @@ class CRTApp(tk.Tk):
 
         time.sleep(0)
         self.logo.place_forget()
-        self.show_frame(Settings)
+        self.show_frame(Login)
 
     def show_frame(self, cont):
 
