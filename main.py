@@ -630,6 +630,7 @@ class CRTApp(tk.Tk):
         # ttkcal.pack(expand=1,fill="both")
 
     def call_keyboard(self,event):
+    	killkeyboard()
         subprocess.Popen("matchbox-keyboard")
 
     def close_keyboard(self,event):
@@ -962,6 +963,8 @@ class TMSConfig(tk.Frame):
         self.buttons.grid(row=1, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w",pady=ENTRYFRAMEPADY-30)
 
     def readjust(self, event):
+
+    	killkeyboard()
 
     	os.system("killall matchbox-keyboard")
     	self.entry.grid_forget()
@@ -1296,8 +1299,8 @@ class Settings(tk.Frame):
         entry1.bind("<Button-1>",controller.call_keyboard)
         entry2.bind("<Button-1>",controller.call_keyboard)
 
-        entry1.bind("<Leave>",controller.close_keyboard)
-        entry2.bind("<Leave>",controller.close_keyboard)
+        # entry1.bind("<Leave>",controller.close_keyboard)
+        # entry2.bind("<Leave>",controller.close_keyboard)
 
         label1.grid(row = 0, column =0,pady=10,sticky="e")
         label2.grid(row = 1, column =0,pady=10,sticky="e")
@@ -1422,7 +1425,7 @@ class Output(tk.Frame):
 
         entry5.bind("<Button-1>",controller.call_keyboard)
 
-        entry5.bind("<Leave>",controller.close_keyboard)
+        # entry5.bind("<Leave>",controller.close_keyboard)
 
         nextButton = tk.Button(buttons, text = "Output", command = lambda : self.validate(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.output,compound="left",font=controller.buttonFont)
         backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller,HH1,MM1,HH2,MM2,entry1,entry3,entry5),image=controller.back,compound="left",font=controller.buttonFont)
@@ -1680,7 +1683,7 @@ class Login(tk.Frame):
         entry2.bind("<Button-1>",controller.call_keyboard)
 
         #entry1.bind("<FocusOut>",controller.close_keyboard)
-        entry2.bind("<Leave>",controller.close_keyboard)
+        # entry2.bind("<Leave>",controller.close_keyboard)
 
         # backButton = ttk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller))
         nextButton = tk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons),image=controller.next,compound="right",font=controller.buttonFont)
@@ -1723,6 +1726,7 @@ class Login(tk.Frame):
 
     def backPressed(self,controller):
 
+    	killkeyboard()
     	self.passw.set("")
     	controller.show_frame(MainScreen)
 
@@ -1767,8 +1771,8 @@ class PasswordChange(tk.Frame):
         entry1.bind("<Button-1>",controller.call_keyboard)
         entry2.bind("<Button-1>",controller.call_keyboard)
 
-        entry1.bind("<Leave>",controller.close_keyboard)
-        entry2.bind("<Leave>",controller.close_keyboard)
+        # entry1.bind("<Leave>",controller.close_keyboard)
+        # entry2.bind("<Leave>",controller.close_keyboard)
 
         backButton = tk.Button(self.buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
         nextButton = tk.Button(self.buttons, text = "Save", command = lambda : self.local_show_frame(controller),image=controller.save,compound="left",font=controller.buttonFont)
