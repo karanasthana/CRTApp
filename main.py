@@ -147,7 +147,9 @@ def inputBox():
     entry = tk.Entry(ibox,width=30,textvariable=v,font=defaultFont)
     entry.grid(row=1,column=0,padx=10)
     entry.bind("<Button-1>",lambda x: subprocess.Popen("matchbox-keyboard"))
-    entry.bind("<Leave>",lambda x: os.system("killall matchbox-keyboard"))
+
+    # ibox.bind("<Button-1>",app.close_keyboard)
+    # entry.bind("<Leave>",lambda x: os.system("killall matchbox-keyboard"))
     # v.set("5")
 
     ti = tk.StringVar(ibox)
@@ -160,6 +162,7 @@ def inputBox():
 
 def checkit(ibox,entry,ti):
     print "31"
+    killkeyboard()
     interval=int(entry.get())
     print "32"
     hm=ti.get()
@@ -766,7 +769,7 @@ class TMSConfig(tk.Frame):
         entry3.bind("<Button-1>",self.adjust)
         entry4.bind("<Button-1>",self.adjust)
 
-        # f.bind("<OnClick>", controller.close_keyboard)
+        f.bind("<Button-1>", self.readjust)
 
         # entry1.bind("<Leave>",self.readjust)
         # entry2.bind("<Leave>",self.readjust)
@@ -954,6 +957,7 @@ class TMSConfig(tk.Frame):
 
     def adjust(self,event):
 
+    	killkeyboard()
     	subprocess.Popen("matchbox-keyboard")
     	self.title.grid_forget()
         self.separator.grid_forget()
@@ -966,7 +970,7 @@ class TMSConfig(tk.Frame):
 
     	killkeyboard()
 
-    	os.system("killall matchbox-keyboard")
+    	# os.system("killall matchbox-keyboard")
     	self.entry.grid_forget()
     	self.buttons.grid_forget()
     	self.title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
@@ -1299,6 +1303,7 @@ class Settings(tk.Frame):
         entry1.bind("<Button-1>",controller.call_keyboard)
         entry2.bind("<Button-1>",controller.call_keyboard)
 
+        self.bind("<Button-1>",controller.close_keyboard)
         # entry1.bind("<Leave>",controller.close_keyboard)
         # entry2.bind("<Leave>",controller.close_keyboard)
 
@@ -1424,6 +1429,8 @@ class Output(tk.Frame):
         time2.grid(row = 4, column =1,padx = 80)
 
         entry5.bind("<Button-1>",controller.call_keyboard)
+
+        self.bind("<Button-1>",controller.close_keyboard)
 
         # entry5.bind("<Leave>",controller.close_keyboard)
 
@@ -1682,6 +1689,8 @@ class Login(tk.Frame):
         #entry1.bind("<FocusIn>",controller.call_keyboard)
         entry2.bind("<Button-1>",controller.call_keyboard)
 
+        self.bind("<Button-1>",controller.close_keyboard)
+
         #entry1.bind("<FocusOut>",controller.close_keyboard)
         # entry2.bind("<Leave>",controller.close_keyboard)
 
@@ -1770,6 +1779,8 @@ class PasswordChange(tk.Frame):
 
         entry1.bind("<Button-1>",controller.call_keyboard)
         entry2.bind("<Button-1>",controller.call_keyboard)
+
+        self.bind("<Button-1>",controller.close_keyboard)
 
         # entry1.bind("<Leave>",controller.close_keyboard)
         # entry2.bind("<Leave>",controller.close_keyboard)
