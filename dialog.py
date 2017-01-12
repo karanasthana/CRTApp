@@ -70,7 +70,6 @@ class Dialog(tk.Toplevel):
         os.system("killall matchbox-keyboard")
         if not self.validate():
             self.initial_focus.focus_set() # put focus back
-            tkMessageBox.showerror("Error", "Invalid Input")
             return
 
         self.withdraw()

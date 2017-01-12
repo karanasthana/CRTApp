@@ -472,6 +472,7 @@ class MyDialog(dialog.Dialog):
     	m = re.search("^\d+$",first)
     	if m:
     		return 1
+    	tkMessageBox.showerror("Error", "Invalid Input")
     	self.entry.delete(0,"end")
     	return 0
 
