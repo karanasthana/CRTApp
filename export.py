@@ -60,8 +60,15 @@ def giveresult(result,interval,outfile):
     
     outstring3="3 " +str(maxdate)+" "+str(maxtime)+" +" + str(maxtemp)+" Deg C HR MAX"
     outstring4="4 " +str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"
-	
+
+    number10 = 0
+    count = epochcalc
+    intt = int(interval)
+    apt_diff = 60*intt
+    i=0
+    
     for row in result:
+        i=i+1
         print "43"
         #number10+=1
         kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(row[0])))
@@ -83,9 +90,21 @@ def giveresult(result,interval,outfile):
             absmintemp=outtemp
             absmindate=outdate
             absmintime=outtime
-            
-        intt = int(interval)		
+
         if epochdiff1%intt==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
+            difference1=epochcalc2-count
+            count=epochcalc2
+            if difference1 == 2*apt_diff:
+                kk2=time.strftime("%d/%m/%Y %H:%M:%S", time.localtime(float(result[i-1][0])-60*intt))
+                outdate_2 = kk2[:10]
+                outtime_2 = kk2[11:16]
+                outtemp_2 = result[i-1][1]
+                if outtemp_2>=0:
+                    outstring = "2 "+str(outdate_2)+" "+outtime_2+" +"+str(outtemp_2)+" Deg C"
+                else:
+                    outstring = "2 "+str(outdate_2)+" "+outtime_2+" -"+str(outtemp_2)+" Deg C"
+                outfile.write(outstring+"\n")
+        
         #if (int(num)%1)==0:
             if perdate!=outdate:
                 perdate=outdate
@@ -136,11 +155,3 @@ def giveresult(result,interval,outfile):
     outfile.write(outstring6+"\n")
     #return "2"
     print "45"
-
-
-
-
-
-
-
-

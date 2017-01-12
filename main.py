@@ -7,17 +7,17 @@ import subprocess
 import os
 import dialog
 
-# import MySQLdb
+import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-# import toaudio
-# import dbms
-# import usb
-# import temperature
-# import export
-# import buzzer
-# import Voltagechecker
+import toaudio
+import dbms
+import usb
+import temperature
+import export
+import buzzer
+import Voltagechecker
 
 import glob
 import shutil
@@ -64,7 +64,7 @@ MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
             "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
-HOMEDIR = "/home/anupam/WorkSpace/CRTApp"
+HOMEDIR = "/home/pi/Documents/New/CRTApp"
 returnToMenu = False
 MINSIZEROW2 = 300
 MINSIZEROW3 = 0
@@ -302,7 +302,7 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
     endepoch=int(time.mktime(time.strptime(d2,"%d-%m-%Y %H:%M:%S")))
     #sql = ("""SELECT * FROM TEMPERATURES1;""")
     #sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATE = '%s' AND TIME='%s')
-    sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATETIME > '%s') AND (DATETIME < '%s');""" %(str(startepoch),str(endepoch)))	
+    sql = ("""SELECT * FROM TEMPERATURES1 WHERE (DATETIME >= '%s') AND (DATETIME <= '%s');""" %(str(startepoch),str(endepoch)))	
     #sql = ("""SELECT * FROM TEMPERATURES1 WHERE (TIME>'%s');""" %(time1))
     cursor.execute(sql)
     result = cursor.fetchall()
@@ -346,7 +346,13 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
         outstring4="4 " +str(mindate)+" "+str(mintime)+" +" + str(mintemp)+" Deg C HR MIN"
 
 	number10 = 0
+	count = epochcalc
+	intt = int(interval)
+	apt_diff = 60*intt
+	i=0
+	
         for row in result:
+            i=i+1
             #number10+=1
             kk=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(row[0])))
             epochcalc2=int(row[0])
@@ -368,9 +374,21 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
                 absmindate=outdate
                 absmintime=outtime
             
-            intt = int(interval)		
             if epochdiff1%intt==0:  #num%60==0																	for every hour (increasing num at every minute(reading))
-            #if (int(num)%1)==0:
+                difference1 = epochcalc2-count
+                count=epochcalc2
+                if difference1 == 2*apt_diff:
+                    kk2=time.strftime("%d/%m/%Y %H:%M:%S",time.localtime(float(result[i-1][0])-60*intt))
+                    outdate_2 = kk2[:10]
+                    outtime_2 = kk2[11:16]
+                    outtemp_2 = result[i-1][1]
+                    if outtemp_2>=0:
+                        outstring = "2 "+str(outdate_2)+" "+outtime_2+" +" +str(outtemp_2)+" Deg C"
+                    else:
+                        outstring = "2 "+str(outdate_2)+" "+outtime_2+" -" +str(outtemp_2)+" Deg C"
+                    outfile.write(outstring+"\n")
+                    
+                                                                                
                 if perdate!=outdate:
                     perdate=outdate
                     outfile.write(outstring3+"\n")														#Writing the hourly maximum and minimum temperature
@@ -461,8 +479,8 @@ class MyDialog(dialog.Dialog):
     def apply(self):
         self.result = int(self.entry.get())
         second = self.ti.get()
-        # global rrr,sss,ddd
-        # export.output_to_file(rrr,ddd,sss,self.result)
+        global rrr,sss,ddd
+        export.output_to_file(rrr,ddd,sss,self.result)
         # usb.usbexport()
         tkMessageBox.showinfo("Done","Exporting Done")
 
@@ -472,7 +490,6 @@ class MyDialog(dialog.Dialog):
     	m = re.search("^\d+$",first)
     	if m:
     		return 1
-    	tkMessageBox.showerror("Error", "Invalid Input")
     	self.entry.delete(0,"end")
     	return 0
 
@@ -926,11 +943,6 @@ class DateTimeSetting(tk.Frame):
 
         killkeyboard()
 
-        global calframe
-
-        if calframe:
-        	calframe.grid_forget()
-
     	a = hh1.get()
     	b = mm1.get()
     	c = hh2.get()
@@ -1331,9 +1343,6 @@ class Output(tk.Frame):
     def validate(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
 
         killkeyboard()
-        global calframe
-        if calframe:
-            calframe.grid_forget()
         axx = hh1.get()
         b = mm1.get()
         c = hh2.get()

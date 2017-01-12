@@ -15,6 +15,8 @@ except ImportError: # py3k
 # import tkFont
 # import Tkinter
 
+defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
+
 def get_calendar(locale, fwday):
     # instantiate proper calendar class
     if locale is None:
@@ -101,7 +103,7 @@ class Calendar(ttk.Frame):
         hframe = ttk.Frame(self)
         lbtn = ttk.Button(hframe, style='L.TButton', command=self._prev_month)
         rbtn = ttk.Button(hframe, style='R.TButton', command=self._next_month)
-        self._header = ttk.Label(hframe, width=15, anchor='center')
+        self._header = ttk.Label(hframe, width=15, anchor='center',font=defaultFont)
         # the calendar
         self._calendar = ttk.Treeview(show='', selectmode='none', height=7)
 
