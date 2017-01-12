@@ -1,6 +1,5 @@
 import Tkinter as tk
 import os
-import tkMessageBox
 
 
 class Dialog(tk.Toplevel):

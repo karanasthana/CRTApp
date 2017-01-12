@@ -926,6 +926,11 @@ class DateTimeSetting(tk.Frame):
 
         killkeyboard()
 
+        global calframe
+
+        if calframe:
+        	calframe.grid_forget()
+
     	a = hh1.get()
     	b = mm1.get()
     	c = hh2.get()
@@ -1326,6 +1331,9 @@ class Output(tk.Frame):
     def validate(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
 
         killkeyboard()
+        global calframe
+        if calframe:
+            calframe.grid_forget()
         axx = hh1.get()
         b = mm1.get()
         c = hh2.get()
