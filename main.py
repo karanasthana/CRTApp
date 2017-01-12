@@ -7,17 +7,17 @@ import subprocess
 import os
 import dialog
 
-import MySQLdb
+# import MySQLdb
 
 # USER DEFINED 
 import pcalendar
-import toaudio
-import dbms
-import usb
-import temperature
-import export
-import buzzer
-import Voltagechecker
+# import toaudio
+# import dbms
+# import usb
+# import temperature
+# import export
+# import buzzer
+# import Voltagechecker
 
 import glob
 import shutil
@@ -64,12 +64,12 @@ MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
             "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
-HOMEDIR = "/home/pi/Documents/New/CRTApp"
+HOMEDIR = "/home/anupam/WorkSpace/CRTApp"
 returnToMenu = False
 MINSIZEROW2 = 300
 MINSIZEROW3 = 0
 MINSIZECOLUMN = 266
-ENTRYFRAMEPADX = 75
+ENTRYFRAMEPADX = 30
 ENTRYFRAMEPADY = 40
 BUTTONFRAMEPADX = 300
 calframe = None
@@ -83,8 +83,6 @@ MAXIMUM = 85.0
 MINIMUM = -5.0
 maxminsiren1=0
 maxminsiren2=0
-
-
 
 def errorBox(msg):
 
@@ -559,7 +557,7 @@ class CRTApp(tk.Tk):
 
         time.sleep(0)
         self.logo.place_forget()
-        self.show_frame(Login)
+        self.show_frame(Settings)
 
     def show_frame(self, cont):
 
@@ -912,10 +910,10 @@ class DateTimeSetting(tk.Frame):
         label3.grid(row = 2, column =0,pady=14,sticky="e")
         label4.grid(row = 3, column =0,pady=14,sticky="e")
 
-        entry1.grid(row = 0, column =1,padx = 80)
-        time1.grid(row = 1, column =1,padx = 80)
-        entry3.grid(row = 2, column =1,padx = 80)
-        time2.grid(row = 3, column =1,padx = 80)
+        entry1.grid(row = 0, column =1,padx = 20)
+        time1.grid(row = 1, column =1,padx = 20)
+        entry3.grid(row = 2, column =1,padx = 20)
+        time2.grid(row = 3, column =1,padx = 20)
 
         nextButton = tk.Button(buttons, text = "Start", command = lambda : self.start_recording(controller,HH1,MM1,HH2,MM2,entry1,entry3),image=controller.start,compound="right",font=controller.buttonFont)
         backButton = tk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,TMSConfig),image=controller.back,compound="left",font=controller.buttonFont)
@@ -1299,11 +1297,11 @@ class Output(tk.Frame):
         label3.grid(row = 3, column =0,pady=10,sticky="e")
         label4.grid(row = 4, column =0,pady=10,sticky="e")
 
-        entry5.grid(row = 0, column =1,padx = 80)
-        entry1.grid(row = 1, column =1,padx = 80)
-        time1.grid(row = 2, column =1,padx = 80)
-        entry3.grid(row = 3, column =1,padx = 80)
-        time2.grid(row = 4, column =1,padx = 80)
+        entry5.grid(row = 0, column =1,padx = 20)
+        entry1.grid(row = 1, column =1,padx = 20)
+        time1.grid(row = 2, column =1,padx = 20)
+        entry3.grid(row = 3, column =1,padx = 20)
+        time2.grid(row = 4, column =1,padx = 20)
 
         entry5.bind("<Button-1>",controller.call_keyboard)
 
