@@ -1563,12 +1563,12 @@ class Login(tk.Frame):
         # entry2.bind("<Leave>",controller.close_keyboard)
 
         # backButton = ttk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller))
-        nextButton = tk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons,entry2),image=controller.next,compound="right",font=controller.buttonFont)
+        nextButton = tk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons),image=controller.next,compound="right",font=controller.buttonFont)
 
         # backButton.grid(row=0 ,column=0,padx=10)
         nextButton.grid(row=0 ,column=1)
         
-    def local_show_frame(self,controller,buttons,entry2):
+    def local_show_frame(self,controller,buttons):
 
         global sss,rrr,ddd
 
@@ -1594,7 +1594,7 @@ class Login(tk.Frame):
         		controller.show_frame(Menu)
         	else:
         		backButton = tk.Button(buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
-        		nextButton = tk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons,entry2),image=controller.next,compound="right",font=controller.buttonFont)
+        		nextButton = tk.Button(buttons, text = "Next", command = lambda : self.local_show_frame(controller,buttons),image=controller.next,compound="right",font=controller.buttonFont)
         		backButton.grid(row=0 ,column=0,padx=10)
         		nextButton.grid(row=0 ,column=1)
 	    		controller.show_frame(TMSConfig)
