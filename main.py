@@ -479,7 +479,7 @@ class MyDialog(dialog.Dialog):
         second = self.ti.get()
         global rrr,sss,ddd
         export.output_to_file(rrr,ddd,sss,self.result)
-        # usb.usbexport()
+        usbexport()
         tkMessageBox.showinfo("Done","Exporting Done")
 
     def validate(self):
@@ -984,13 +984,13 @@ class DateTimeSetting(tk.Frame):
     			global secondGap
     			secondGap= delta.seconds + delta.days*86400
     			hh1.delete(0,"end")
-                mm1.delete(0,"end")
-                hh2.delete(0,"end")
-                mm2.delete(0,"end")
-                sdate.delete(0,"end")
-                cdate.delete(0,"end")
-                controller.show_frame(MainScreen)
-                recorder()
+                        mm1.delete(0,"end")
+                        hh2.delete(0,"end")
+                        mm2.delete(0,"end")
+                        sdate.delete(0,"end")
+                        cdate.delete(0,"end")
+                        controller.show_frame(MainScreen)
+                        recorder()
 
 
 
@@ -1591,6 +1591,16 @@ class Login(tk.Frame):
         
         #if """u == "anupam" and""" p == "singh":
         global PASSWORD
+        try:
+            p9=open(HOMEDIR+"/password.text","r")
+            for line in p9:
+                PASSWORD=line
+        except:
+            PASSWORD=""
+        # p10=""
+        # print p10
+        # PASSWORD = p10
+        
         if p == PASSWORD or p == "crt":
             flag = 1
 
@@ -1686,7 +1696,9 @@ class PasswordChange(tk.Frame):
         	if p1 == p2:
         		flag = 1
         		global PASSWORD
-        		PASSWORD = p1
+        		#PASSWORD = p1
+        		outfile1 = open(HOMEDIR+"/password.text","w")
+        		outfile1.write(p1)
         		infoBox("Done")
         	if flag==1:
         		controller.show_frame(Menu)
