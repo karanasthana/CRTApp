@@ -5,12 +5,13 @@ import re
 import tkMessageBox
 import subprocess
 import os
-import dialog
-
+import hashlib
 # import MySQLdb
+
 
 # USER DEFINED 
 import pcalendar
+import dialog
 # import toaudio
 # import dbms
 # import usb
@@ -73,7 +74,7 @@ ENTRYFRAMEPADX = 30
 ENTRYFRAMEPADY = 40
 BUTTONFRAMEPADX = 300
 calframe = None
-PASSWORD = "crt"
+PASSWORD = "2282de20b84a7bf6a5c8d95b821be1ff072948435b1dc7cb60205d837b90077dee7dbefbcff55fe15e7b41074f1302d7ea458562a6c86c203473ef24ea64d234"
 nn=0
 rrr = "RRRR"
 sss = "RRRR"
@@ -264,7 +265,7 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
     sql= """USE CRT1;"""
     cursor.execute(sql)
 	
-    outfile = open("output.text","w") 													#ismei save krenge output
+    outfile = open("data/output.dat","w") 													#ismei save krenge output
 
     global rrr,sss,ddd
     rrr=rrr.upper()
@@ -626,7 +627,7 @@ class CRTApp(tk.Tk):
         self.line_offset = []
         offset = 0
         x = 0
-        file = open('output.text','r')
+        file = open('data/output.dat','r')
         for line in file:
             if(x == 0):
                 self.line_offset.append(offset)
@@ -636,7 +637,7 @@ class CRTApp(tk.Tk):
         # file.seek(0)
 
     def read_file(self,direction):
-        infile = open('output.text', 'r')
+        infile = open('data/output.dat', 'r')
         if direction == 0:
             self.it = self.it - 1
         if direction == 1:
@@ -1394,9 +1395,9 @@ class Output(tk.Frame):
                     calframe.grid_forget()
                 global rrr,sss,ddd, outfile,out
                 output_on_screen(rrr,ddd,sss,g,e,f,axx,c,b,d)
-                # num_lines = sum(1 for line in open('output.text'))
+                # num_lines = sum(1 for line in open('data/output.dat'))
                 # out.config(height=num_lines+100)
-                # file = open('output.text','r')
+                # file = open('data/output.dat','r')
                 # file.close()
                 controller.read_file_helper()
                 controller.it = -1
@@ -1453,7 +1454,7 @@ class ViewOutput(tk.Frame):
         frame.rowconfigure(1, weight=1)
         frame.columnconfigure(1, weight=1)
         
-        # num_lines = sum(1 for line in open('output.text'))
+        # num_lines = sum(1 for line in open('data/output.dat'))
         # print num_lines
         global out
         out = tk.Text(frame, state="normal",width = 90,height = 25)
@@ -1591,17 +1592,17 @@ class Login(tk.Frame):
         
         #if """u == "anupam" and""" p == "singh":
         global PASSWORD
+        UPASSWORD = None
         try:
-            p9=open(HOMEDIR+"/password.text","r")
+            p9=open("data/securp.dat","r")
             for line in p9:
-                PASSWORD=line
+                UPASSWORD=line
         except:
-            PASSWORD=""
-        # p10=""
-        # print p10
-        # PASSWORD = p10
-        
-        if p == PASSWORD or p == "crt":
+            pass
+
+        hashObject = hashlib.sha512(p)
+        p = hashObject.hexdigest()
+        if p == UPASSWORD or p == PASSWORD:
             flag = 1
 
         
@@ -1697,9 +1698,11 @@ class PasswordChange(tk.Frame):
         		flag = 1
         		global PASSWORD
         		#PASSWORD = p1
-        		outfile1 = open(HOMEDIR+"/password.text","w")
-        		outfile1.write(p1)
-        		infoBox("Done")
+        		outfile1 = open("data/securp.dat","w")
+                hashObject = hashlib.sha512(p1)
+                p1 = hashObject.hexdigest()
+                outfile1.write(p1)
+                infoBox("Done")
         	if flag==1:
         		controller.show_frame(Menu)
         	else:
