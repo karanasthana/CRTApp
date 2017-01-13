@@ -6,18 +6,18 @@ import tkMessageBox
 import subprocess
 import os
 import hashlib
-# import MySQLdb
+import MySQLdb
 
 
 # USER DEFINED 
 import pcalendar
 import dialog
-# import toaudio
-# import dbms
-# import usb
-# import temperature
-# import export
-# import buzzer
+import toaudio
+import dbms
+import usb
+import temperature
+import export
+import buzzer
 # import Voltagechecker
 
 import glob
@@ -65,7 +65,7 @@ MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
             "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
-HOMEDIR = "/home/anupam/WorkSpace/CRTApp"
+HOMEDIR = "/home/pi/Downloads/CRTApp"
 returnToMenu = False
 MINSIZEROW2 = 300
 MINSIZEROW3 = 0
@@ -265,7 +265,7 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
     sql= """USE CRT1;"""
     cursor.execute(sql)
 	
-    outfile = open("data/output.dat","w") 													#ismei save krenge output
+    outfile = open(HOMEDIR+"/data/output.dat","w") 													#ismei save krenge output
 
     global rrr,sss,ddd
     rrr=rrr.upper()
@@ -627,7 +627,7 @@ class CRTApp(tk.Tk):
         self.line_offset = []
         offset = 0
         x = 0
-        file = open('data/output.dat','r')
+        file = open(HOMEDIR+'/data/output.dat','r')
         for line in file:
             if(x == 0):
                 self.line_offset.append(offset)
@@ -637,7 +637,7 @@ class CRTApp(tk.Tk):
         # file.seek(0)
 
     def read_file(self,direction):
-        infile = open('data/output.dat', 'r')
+        infile = open(HOMEDIR+'/data/output.dat', 'r')
         if direction == 0:
             self.it = self.it - 1
         if direction == 1:
@@ -1395,9 +1395,9 @@ class Output(tk.Frame):
                     calframe.grid_forget()
                 global rrr,sss,ddd, outfile,out
                 output_on_screen(rrr,ddd,sss,g,e,f,axx,c,b,d)
-                # num_lines = sum(1 for line in open('data/output.dat'))
+                # num_lines = sum(1 for line in open(HOMEDIR+'/data/output.dat'))
                 # out.config(height=num_lines+100)
-                # file = open('data/output.dat','r')
+                # file = open(HOMEDIR+'/data/output.dat','r')
                 # file.close()
                 controller.read_file_helper()
                 controller.it = -1
@@ -1454,7 +1454,7 @@ class ViewOutput(tk.Frame):
         frame.rowconfigure(1, weight=1)
         frame.columnconfigure(1, weight=1)
         
-        # num_lines = sum(1 for line in open('data/output.dat'))
+        # num_lines = sum(1 for line in open(HOMEDIR+'/data/output.dat'))
         # print num_lines
         global out
         out = tk.Text(frame, state="normal",width = 90,height = 25)
@@ -1594,7 +1594,7 @@ class Login(tk.Frame):
         global PASSWORD
         UPASSWORD = None
         try:
-            p9=open("data/securp.dat","r")
+            p9=open(HOMEDIR+"/data/securp.dat","r")
             for line in p9:
                 UPASSWORD=line
         except:
@@ -1698,7 +1698,7 @@ class PasswordChange(tk.Frame):
         		flag = 1
         		global PASSWORD
         		#PASSWORD = p1
-        		outfile1 = open("data/securp.dat","w")
+        		outfile1 = open(HOMEDIR+"/data/securp.dat","w")
                 hashObject = hashlib.sha512(p1)
                 p1 = hashObject.hexdigest()
                 outfile1.write(p1)

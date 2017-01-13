@@ -3,9 +3,9 @@
 import sys
 sys.path.append('/home/pi/Downloads/CRTApp')
 
-import CRT
+import main
 
 try:
-    CRT()
+    main()
 except:
     print "DON'T CLOSE"
