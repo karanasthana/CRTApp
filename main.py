@@ -1,3 +1,5 @@
+### ### ### ### ### ### THIRD PARTY LIBRARIES ### ### ### ### ### ###
+
 import calendar
 import time
 import datetime
@@ -7,54 +9,40 @@ import subprocess
 import os
 import hashlib
 import sys
-# import MySQLdb
-
-
-# USER DEFINED 
-import pcalendar
-import dialog
-# import toaudio
-# import dbms
-# import usb
-# import temperature
-# import export
-# import buzzer
-# import Voltagechecker
-
 import glob
 import shutil
-# import pyaudio
 import binascii
+# import pyaudio
+import MySQLdb
 
 try:
     import Tkinter as tk
     import tkFont
     import ttk
-except ImportError:
+except ImportError: #py3
     import tkinter as tk
     import tkinter.font as tkFont
     import tkinter.ttk as ttk
 
-"""#def dummyProgress(x):
 
-    global app
-    x.destroy()
-    pbox = tk.Toplevel(app)
-    pbox.wm_geometry("360x100")
-    pbox.wm_title("Exporting")
-    defaultFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
+### ### ### ### ### ### USER DEFINED LIBRARIES ### ### ### ### ### ###
 
-    label = tk.Label(pbox,text="Exporting",font = defaultFont)
-    label.grid(padx=10,pady=10,sticky="w")
+    """ modules defined locally in the interest of the project """
 
-    pb = ttk.Progressbar(pbox, orient='horizontal', mode='determinate',length='300')
-    pb.grid(row=1,pady=10,padx=30)
+import pcalendar            #Calender Widget
+import dialog               #Export Dialog Box
+import toaudio              #Export via 3.5mm Jack
+import dbms                 #Updating and Querying DB
+import usb                  #Export via USB
+import temperature          #Fetch Temperature
+import export               #Export Functionality
+import buzzer               #Control Buzzer
+# import Voltagechecker       #Voltage Checking
 
-    pb.start(1)
-    app.after(2000,lambda:dummyDone(pbox))
-    pbox.mainloop()"""
 
-    # dummyDone()
+### ### ### ### ### ### GLOBAL DECLARATION ### ### ### ### ### ###
+
+    """ Global Variables used to set various parameters used in the CRTApp """
 
 TILIST = ["Minutes"]
 HHLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
@@ -66,7 +54,7 @@ MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
             "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
-HOMEDIR = "/home/anupam/WorkSpace/CRTApp"
+HOMEDIR = "/home/pi/Downloads/CRTApp"
 returnToMenu = False
 MINSIZEROW2 = 300
 MINSIZEROW3 = 0
