@@ -3,17 +3,17 @@
 import calendar
 import time
 import datetime
-import re
-import tkMessageBox
-import subprocess
-import os
-import hashlib
-import sys
+import re               #Regular Expression
+import tkMessageBox     #Error and Info Box
+import subprocess       #Keyboard Call
+import os               #Keyboard Kill
+import hashlib          #Password Security
+import sys              #Check fo linux(Jessie)
 import glob
 import shutil
 import binascii
-# import pyaudio
 import MySQLdb
+# import pyaudio
 
 try:
     import Tkinter as tk
@@ -27,7 +27,7 @@ except ImportError: #py3
 
 ### ### ### ### ### ### USER DEFINED LIBRARIES ### ### ### ### ### ###
 
-    """ modules defined locally in the interest of the project """
+""" modules defined locally in the interest of the project """
 
 import pcalendar            #Calender Widget
 import dialog               #Export Dialog Box
@@ -42,63 +42,69 @@ import buzzer               #Control Buzzer
 
 ### ### ### ### ### ### GLOBAL DECLARATION ### ### ### ### ### ###
 
-    """ Global Variables used to set various parameters used in the CRTApp """
+""" Global Variables used to set various parameters used in the CRTApp """
 
-TILIST = ["Minutes"]
+HOMEDIR = "/home/pi/Downloads/CRTApp" #Home Directory for the Application Folder
+
+TILIST = ["Minutes"]  #Time Interval List
 HHLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
-            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
+            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"] #Hour List
 MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
             "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
             "31", "32", "33", "34", "35", "36", "37", "38", "39", "40",
             "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
-            "51", "52", "53", "54", "55", "56", "57", "58", "59"]
+            "51", "52", "53", "54", "55", "56", "57", "58", "59"]  #Minute List
 
-HOMEDIR = "/home/pi/Downloads/CRTApp"
-returnToMenu = False
-MINSIZEROW2 = 300
-MINSIZEROW3 = 0
-MINSIZECOLUMN = 266
+returnToMenu = False  #Boolean Variable for flow of Control(used by frames: Login and TMSConfig)
+MINSIZEROW2 = 300   #Minimum Row Height (row 2)
+MINSIZEROW3 = 0 #Minimum Row Height (row 3)
+MINSIZECOLUMN = 266 #Minimum Column Width (all)
 ENTRYFRAMEPADX = 40
 ENTRYFRAMEPADY = 40
 BUTTONFRAMEPADX = 300
-calframe = None
+calframe = None #Calendar Frame
 PASSWORD = "2282de20b84a7bf6a5c8d95b821be1ff072948435b1dc7cb60205d837b90077dee7dbefbcff55fe15e7b41074f1302d7ea458562a6c86c203473ef24ea64d234"
 nn=0
-rrr = "RRRR"
-sss = "RRRR"
-ddd = "RRRR"
+rrr = "RRRR"    #Railway Name
+sss = "RRRR"    #Station Name
+ddd = "RRRR"    #Division Name
 # mmm = "RRRR"
-MAXIMUM = 85.0
-MINIMUM = -5.0
+MAXIMUM = 85.0  #Maximum Temperature to set off the alarm
+MINIMUM = -5.0  #Minimum Temperature to set off the alarm
 maxminsiren1=0
 maxminsiren2=0
 
+### ### ### ### ### ### GLOBAL METHODS ### ### ### ### ### ###
+    
+""" these methods are used independent of the CRTApp class definition """
+
 def errorBox(msg):
+
+    """show custom error box """
 
     tkMessageBox.showerror("Error", msg)
 
 def infoBox(msg):
 
+    """show custome message box """
+
     tkMessageBox.showinfo("Done",msg)
-    return 1
-
-def killkeyboard():
-
-	os.system("killall matchbox-keyboard")
-
 
 def qf():
     print ("done")
 
 def get_calendar(locale, fwday):
-    # instantiate proper calendar class
+
+    """ instantiate proper calendar class """
+
     if locale is None:
         return calendar.TextCalendar(fwday)
     else:
         return calendar.LocaleTextCalendar(fwday, locale)
 
 def update_maxmin(temp):
+
     global secondGap,mx,mn,prev_date,MAXIMUM,MINIMUM,maxminsiren1,maxminsiren2
     current_time=str(datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
     date=str(prev_date)
@@ -162,6 +168,10 @@ def update_maxmin(temp):
     return (mx,mn)
 
 def recorder(num = 1):
+
+    """ this is a recursive module which uses "after" to update the mainscreen 
+    per second with current date time and max min and current temperature"""
+
     global app
     global t1,t2,t3,date,times,rrr,sss,ddd,rrrr,ssss,div,mx,mn,prev_date
     if num is 1:
@@ -443,6 +453,10 @@ class AutoScrollbar(tk.Scrollbar):
 
 class MyDialog(dialog.Dialog):
 
+    """ a dialog box that is drawn on Toplevel and grabs focus from "app" 
+    until its completed or canceled 
+    Dialog class imported from dialog"""
+
     def body(self, master):
 
         defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
@@ -595,10 +609,10 @@ class CRTApp(tk.Tk):
         # ttkcal.pack(expand=1,fill="both")
 
     def call_keyboard(self,event):
-    	killkeyboard()
+    	self.close_keyboard()
         subprocess.Popen("matchbox-keyboard")
 
-    def close_keyboard(self,event):
+    def close_keyboard(self,event=None):
         os.system("killall matchbox-keyboard")
 
     def checkNextBack(self):
@@ -742,17 +756,14 @@ class TMSConfig(tk.Frame):
 
         flag = 0
 
-        # os.system("killall matchbox-keyboard")
+        controller.close_keyboard()
 
-        os.system("killall matchbox-keyboard")
     	self.entry.grid_forget()
     	self.buttons.grid_forget()
     	self.title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
     	self.separator.grid(row=1,column=0,columnspan=3,sticky="ew")
     	self.entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
     	self.buttons.grid(row=3, column=0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
-
-        killkeyboard()
 
         # w=mn.get()
         x=rr.get()
@@ -799,7 +810,7 @@ class TMSConfig(tk.Frame):
 
     	global sss,rrr,ddd#,mmm
 
-    	os.system("killall matchbox-keyboard")
+    	controller.close_keyboard()
     	self.entry.grid_forget()
     	self.buttons.grid_forget()
     	self.title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
@@ -820,7 +831,7 @@ class TMSConfig(tk.Frame):
 
     def adjust(self,event):
 
-    	killkeyboard()
+    	os.system("killall matchbox-keyboard") #controller.close_keyboard()
     	subprocess.Popen("matchbox-keyboard")
     	self.title.grid_forget()
         self.separator.grid_forget()
@@ -831,9 +842,7 @@ class TMSConfig(tk.Frame):
 
     def readjust(self, event):
 
-    	killkeyboard()
-
-    	# os.system("killall matchbox-keyboard")
+    	os.system("killall matchbox-keyboard") # controller.close_keyboard()
     	self.entry.grid_forget()
     	self.buttons.grid_forget()
     	self.title.grid(row=0,column=0,pady=10,padx=10,columnspan=3, sticky = "w")
@@ -928,7 +937,7 @@ class DateTimeSetting(tk.Frame):
 
 		global calframe
 
-		killkeyboard()
+		controller.close_keyboard()
 		
 		if calframe :
 			calframe.place_forget()
@@ -950,7 +959,7 @@ class DateTimeSetting(tk.Frame):
 
         global c,d,f
 
-        killkeyboard()
+        controller.close_keyboard()
 
         global calframe
 
@@ -1097,7 +1106,7 @@ class MainScreen(tk.Frame):
 
         global returnToMenu
 
-        killkeyboard()
+        controller.close_keyboard()
 
         returnToMenu = True
 
@@ -1150,7 +1159,7 @@ class Menu(tk.Frame):
 
     def local_show_frame(self, controller):
 
-        killkeyboard()
+        controller.close_keyboard()
 
         controller.show_frame(TMSConfig)
 
@@ -1216,7 +1225,7 @@ class Settings(tk.Frame):
 
         global MAXIMUM,MINIMUM
         
-        killkeyboard()
+        controller.close_keyboard()
 
         xx=Entry1.get()
         yy=Entry2.get()
@@ -1240,7 +1249,7 @@ class Settings(tk.Frame):
 
     	global MAXIMUM,MINIMUM
     	
-    	killkeyboard()
+    	controller.close_keyboard()
 
     	Entry1.set(MAXIMUM)
     	Entry2.set(MINIMUM)
@@ -1339,7 +1348,7 @@ class Output(tk.Frame):
 
     def backPressed(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
 
-        killkeyboard()
+        controller.close_keyboard()
         sdate.delete(0,"end")
     	edate.delete(0,"end")
     	intr.delete(0,"end")
@@ -1358,7 +1367,7 @@ class Output(tk.Frame):
 
     def validate(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
 
-        killkeyboard()
+        controller.close_keyboard()
         global calframe
         if calframe:
             calframe.place_forget()
@@ -1600,7 +1609,7 @@ class Login(tk.Frame):
 
         global sss,rrr,ddd
 
-        killkeyboard()
+        controller.close_keyboard()
 
         flag = 0
 
@@ -1641,7 +1650,7 @@ class Login(tk.Frame):
 
     def backPressed(self,controller):
 
-    	killkeyboard()
+    	controller.close_keyboard()
     	self.passw.set("")
     	controller.show_frame(MainScreen)
 
@@ -1702,7 +1711,7 @@ class PasswordChange(tk.Frame):
 
         global sss,rrr,ddd
 
-        killkeyboard()
+        controller.close_keyboard()
 
         flag = 0
 
@@ -1732,7 +1741,7 @@ class PasswordChange(tk.Frame):
 
     def backPressed(self,controller):
 
-    	killkeyboard()
+    	controller.close_keyboard()
     	
     	self.passw1.set("")
         self.passw2.set("")
