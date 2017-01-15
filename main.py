@@ -6,6 +6,7 @@ import tkMessageBox
 import subprocess
 import os
 import hashlib
+import sys
 import MySQLdb
 
 
@@ -480,7 +481,7 @@ class MyDialog(dialog.Dialog):
         second = self.ti.get()
         global rrr,sss,ddd
         export.output_to_file(rrr,ddd,sss,self.result)
-        usbexport()
+        usb.usbexport()
         tkMessageBox.showinfo("Done","Exporting Done")
 
     def validate(self):
@@ -556,7 +557,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        time.sleep(0)
+        time.sleep(1)
         self.logo.place_forget()
         self.show_frame(Login)
 
@@ -567,7 +568,7 @@ class CRTApp(tk.Tk):
 
     def update(self, calframe,e,d,m,y):
 
-        calframe.grid_forget()
+        calframe.place_forget()
         # calframe.destroy()
 
         # YYYY = ttkcal._date.year
@@ -584,7 +585,10 @@ class CRTApp(tk.Tk):
     def call_calendar(self,container,x,y,e):
 
         global calframe
-        calframe = ttk.Frame(container,borderwidth=3,relief=tk.GROOVE)
+        calframe = ttk.Frame(self,borderwidth=3,relief=tk.GROOVE)
+        if 'win' not in sys.platform:
+            style = ttk.Style()
+            style.configure('Treeview',rowheight=40)
         ttkcal = pcalendar.Calendar(calframe,self.update,e,firstweekday=pcalendar.calendar.SUNDAY)
         ttkcal.grid(row=0,column=0)
 
@@ -592,7 +596,9 @@ class CRTApp(tk.Tk):
         # close.grid(row=0,column=1,sticky="nw")
         # calframe.grid(row=0,column=1,rowspan=4)
 
-        calframe.grid(row=0,column=2,rowspan=5)#pady=y+150,padx=x-10)
+        # calframe.grid(row=0,column=2,rowspan=5)#pady=y+150,padx=x-10)
+        calframe.place(relx=0.67,rely=0.5, anchor="center")
+        # calframe.pack()
 
         # calframe = tk.Toplevel(self)
         # calframe.wm_geometry("800x480")
@@ -869,6 +875,7 @@ class DateTimeSetting(tk.Frame):
         entry = tk.Frame(self)
         entry.grid(row=2, column=0, pady=ENTRYFRAMEPADY,padx=ENTRYFRAMEPADX)
         entry.grid_columnconfigure(2,minsize=220)
+        # entry.grid_rowconfigure(4,minsize=50)
 
         buttons = tk.Frame(self)#, borderwidth=5, relief=tk.GROOVE)
         buttons.grid(row=3, column=0,pady = 0,padx=BUTTONFRAMEPADX-40, columnspan=3,sticky="w")
@@ -878,18 +885,20 @@ class DateTimeSetting(tk.Frame):
         label3 = tk.Label(entry, text = "START DATE :",font=controller.defaultFont)
         label4 = tk.Label(entry, text = "START TIME :",font=controller.defaultFont)
 
-        entry1 = tk.Entry(entry,font=controller.defaultFont)
+        currentDate = tk.StringVar(entry)
+        currentDate.set("1-1-2017")
+        entry1 = tk.Entry(entry,font=controller.defaultFont,textvariable = currentDate)
 
         time1 = tk.Frame(entry)
 
         hh1 = tk.StringVar(time1)
         hh1.set(HHLIST[0])
-        HH1 = ttk.Combobox(time1, textvariable = hh1, values=HHLIST,width=8,font=controller.defaultFont)
+        HH1 = tk.Entry(time1, textvariable = hh1,width=9,font=controller.defaultFont)
         HH1.grid(row=0,column=0,padx=3)
         
         mm1 = tk.StringVar(time1)
         mm1.set(MMLIST[0])
-        MM1 = ttk.Combobox(time1, textvariable = mm1, values=MMLIST,width=8,font=controller.defaultFont)
+        MM1 = tk.Entry(time1, textvariable = mm1,width=9,font=controller.defaultFont)
         MM1.grid(row=0,column = 1,padx=3)
                 
         time2 = tk.Frame(entry)
@@ -918,12 +927,12 @@ class DateTimeSetting(tk.Frame):
 
         nextButton = tk.Button(buttons, text = "Start", command = lambda : self.start_recording(controller,HH1,MM1,HH2,MM2,entry1,entry3),image=controller.start,compound="right",font=controller.buttonFont)
         backButton = tk.Button(buttons, text = "Back", command = lambda : self.local_show_frame(controller,TMSConfig),image=controller.back,compound="left",font=controller.buttonFont)
-        date1 = tk.Button(entry, image=controller.cal, command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=30,height=30)
+        # date1 = tk.Button(entry, image=controller.cal, command = lambda:controller.call_calendar(entry,date1.winfo_x(),date1.winfo_y(),entry1), width=30,height=30)
         date2 = tk.Button(entry, image=controller.cal, command = lambda:controller.call_calendar(entry,date2.winfo_x(),date2.winfo_y(),entry3), width=30,height=30)
 
         backButton.grid(column = 0,padx = 10)
         nextButton.grid(row = 0,column = 1)
-        date1.grid(row=0,column=2,sticky="w")
+        # date1.grid(row=0,column=2,sticky="w")
         date2.grid(row=2,column=2,sticky="w")
 
     def local_show_frame(self,controller,f):
@@ -933,7 +942,7 @@ class DateTimeSetting(tk.Frame):
 		killkeyboard()
 		
 		if calframe :
-			calframe.grid_forget()
+			calframe.place_forget()
 		controller.show_frame(f)
 
     def start_recording(self,controller,hh1,mm1,hh2,mm2,cdate,sdate):
@@ -945,7 +954,7 @@ class DateTimeSetting(tk.Frame):
         global calframe
 
         if calframe :
-            calframe.grid_forget()
+            calframe.place_forget()
 
     	a = hh1.get()
     	b = mm1.get()
@@ -1337,7 +1346,7 @@ class Output(tk.Frame):
     	mm2.delete(0,"end")
         global calframe
         if calframe:
-            calframe.grid_forget()
+            calframe.place_forget()
         controller.show_frame(Menu)
     
     # def backPressed(self,controller,hh1,mm1,hh2,mm2,sdate,edate,intr):
@@ -1349,7 +1358,7 @@ class Output(tk.Frame):
         killkeyboard()
         global calframe
         if calframe:
-            calframe.grid_forget()
+            calframe.place_forget()
         axx = hh1.get()
         b = mm1.get()
         c = hh2.get()
@@ -1400,7 +1409,7 @@ class Output(tk.Frame):
                 # secondGap= delta.seconds + delta.days*86400
                 global calframe
                 if calframe:
-                    calframe.grid_forget()
+                    calframe.place_forget()
                 global rrr,sss,ddd, outfile,out
                 output_on_screen(rrr,ddd,sss,g,e,f,axx,c,b,d)
                 # num_lines = sum(1 for line in open(HOMEDIR+'/data/output.dat'))

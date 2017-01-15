@@ -93,7 +93,7 @@ class Calendar(ttk.Frame):
         # custom ttk styles
         style = ttk.Style(self.master)
         # style2 = ttk.Style(self.master)
-        # style2.configure('Calendar.Treeview',relief=Tkinter.GROOVE)
+        # style.configure('Calendar.Treeview',rowheight=30)
         # print style.element_names()
         # print style.layout('Calendar.Treeview')
         arrow_layout = lambda dir: (
@@ -257,7 +257,8 @@ def test():
 
     if 'win' not in sys.platform:
         style = ttk.Style()
-        style.theme_use('clam')
+        style.configure('Treeview',rowheight=40)
+        # style.theme_use('clam')
 
     
 
