@@ -3,8 +3,6 @@ import time
 import datetime
 import usb
 
-HOMEDIR = "/home/pi/Downloads/CRTApp"
-
 def output_to_file(r,d,s,interval):
   
     db = MySQLdb.connect("localhost","root","password") 							#connect the database
@@ -13,7 +11,7 @@ def output_to_file(r,d,s,interval):
     sql= """USE CRT1;"""
     cursor.execute(sql)
 	
-    outfile = open(HOMEDIR+"/exporting.dat","w") 													#ismei save krenge output || name can preferably be the date!
+    outfile = open("/home/pi/Desktop/exporting.dat","w") 													#ismei save krenge output || name can preferably be the date!
    	
     outstring1 = "1 "+r+" "+d+" "+s
     outfile.write(outstring1+"\n")  															#Line-1 into the file

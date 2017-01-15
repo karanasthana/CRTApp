@@ -7,18 +7,18 @@ import subprocess
 import os
 import hashlib
 import sys
-import MySQLdb
+# import MySQLdb
 
 
 # USER DEFINED 
 import pcalendar
 import dialog
-import toaudio
-import dbms
-import usb
-import temperature
-import export
-import buzzer
+# import toaudio
+# import dbms
+# import usb
+# import temperature
+# import export
+# import buzzer
 # import Voltagechecker
 
 import glob
@@ -66,12 +66,12 @@ MMLIST = ["00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
             "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
             "51", "52", "53", "54", "55", "56", "57", "58", "59"]
 
-HOMEDIR = "/home/pi/Downloads/CRTApp"
+HOMEDIR = "/home/anupam/WorkSpace/CRTApp"
 returnToMenu = False
 MINSIZEROW2 = 300
 MINSIZEROW3 = 0
 MINSIZECOLUMN = 266
-ENTRYFRAMEPADX = 30
+ENTRYFRAMEPADX = 40
 ENTRYFRAMEPADY = 40
 BUTTONFRAMEPADX = 300
 calframe = None
@@ -80,7 +80,7 @@ nn=0
 rrr = "RRRR"
 sss = "RRRR"
 ddd = "RRRR"
-mmm = "RRRR"
+# mmm = "RRRR"
 MAXIMUM = 85.0
 MINIMUM = -5.0
 maxminsiren1=0
@@ -199,7 +199,7 @@ def recorder(num = 1):
         todaytime = str(today1[11:19])
         today1= str(today1[:10])
         # global mx,mn,nn
-        prev_date=today1
+        prev_date=today1[8:10]+"/"+today1[5:7]+"/"+today1[:4]
         prev_time=todaytime
         if float(tt)<MAXIMUM:
             if maxminsiren1>0:
@@ -266,7 +266,7 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
     sql= """USE CRT1;"""
     cursor.execute(sql)
 	
-    outfile = open(HOMEDIR+"/data/output.dat","w") 													#ismei save krenge output
+    outfile = open("/home/pi/Desktop/output.dat","w") 													#ismei save krenge output
 
     global rrr,sss,ddd
     rrr=rrr.upper()
@@ -580,7 +580,7 @@ class CRTApp(tk.Tk):
         DD = d
 
         e.delete(0, "end")
-        e.insert(0,str(DD) + '-' + str(MM) + '-' + str(YYYY))
+        e.insert(0,"%02d" % int(DD) + '-' + "%02d" % int(MM) + '-' + str(YYYY))
 
     def call_calendar(self,container,x,y,e):
 
@@ -633,7 +633,7 @@ class CRTApp(tk.Tk):
         self.line_offset = []
         offset = 0
         x = 0
-        file = open(HOMEDIR+'/data/output.dat','r')
+        file = open('/home/pi/Desktop/output.dat','r')
         for line in file:
             if(x == 0):
                 self.line_offset.append(offset)
@@ -643,7 +643,7 @@ class CRTApp(tk.Tk):
         # file.seek(0)
 
     def read_file(self,direction):
-        infile = open(HOMEDIR+'/data/output.dat', 'r')
+        infile = open('/home/pi/Desktop/output.dat', 'r')
         if direction == 0:
             self.it = self.it - 1
         if direction == 1:
@@ -708,16 +708,16 @@ class TMSConfig(tk.Frame):
         label1 = tk.Label(self.entry, text = "Railway Name :",font = controller.defaultFont)
         label2 = tk.Label(self.entry, text = "Division Name :",font=controller.defaultFont)
         label3 = tk.Label(self.entry, text = "Station Name :",font=controller.defaultFont)
-        label4 = tk.Label(self.entry, text = "Model Number :", font=controller.defaultFont)        
+        # label4 = tk.Label(self.entry, text = "Model Number :", font=controller.defaultFont)        
         
         self.w = tk.StringVar()
         self.x = tk.StringVar()
         self.y = tk.StringVar()
-        self.z = tk.StringVar()
+        # self.z = tk.StringVar()
         entry1 = tk.Entry(self.entry,textvariable=self.w,font=controller.defaultFont)
         entry2 = tk.Entry(self.entry,textvariable=self.x,font=controller.defaultFont)
         entry3 = tk.Entry(self.entry,textvariable=self.y,font=controller.defaultFont)
-        entry4 = tk.Entry(self.entry,textvariable=self.z,font=controller.defaultFont)
+        # entry4 = tk.Entry(self.entry,textvariable=self.z,font=controller.defaultFont)
 
         self.w.trace("w", lambda x,y,z:self.autocapitalize(self.w))
         self.x.trace("w", lambda x,y,z:self.autocapitalize(self.x))
@@ -726,31 +726,31 @@ class TMSConfig(tk.Frame):
         entry1.bind("<Button-1>",self.adjust)
         entry2.bind("<Button-1>",self.adjust)
         entry3.bind("<Button-1>",self.adjust)
-        entry4.bind("<Button-1>",self.adjust)
+        # entry4.bind("<Button-1>",self.adjust)
 
         f.bind("<Button-1>", self.readjust)
 
-        label1.grid(row = 0, column =0,pady=7,sticky="e")
-        label2.grid(row = 1, column =0,pady=7,sticky="e")
-        label3.grid(row = 2, column =0,pady=7,sticky="e")
-        label4.grid(row = 3, column =0,pady=7,sticky="e")
+        label1.grid(row = 0, column =0,pady=10,sticky="e")
+        label2.grid(row = 1, column =0,pady=10,sticky="e")
+        label3.grid(row = 2, column =0,pady=10,sticky="e")
+        # label4.grid(row = 3, column =0,pady=7,sticky="e")
 
         entry1.grid(row = 0, column =1,padx = 80)
         entry2.grid(row = 1, column =1,padx = 80)
         entry3.grid(row = 2, column =1,padx = 80)
-        entry4.grid(row = 3, column =1,padx = 80)
+        # entry4.grid(row = 3, column =1,padx = 80)
 
         
-        nextButton = tk.Button(self.buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2,entry3,entry4,self.buttons)
+        nextButton = tk.Button(self.buttons, text = "Save", command = lambda : self.local_show_frame(controller,entry1,entry2,entry3,self.buttons)
             ,image=controller.save,compound="left",font=controller.buttonFont)
 
         nextButton.grid(row=0,column=0)
         f.grid()
         
 
-    def local_show_frame(self,controller,rr,dd,ss,mn,buttons):
+    def local_show_frame(self,controller,rr,dd,ss,buttons):
 
-        global sss,rrr,ddd,mmm
+        global sss,rrr,ddd#,mmm
 
         flag = 0
 
@@ -766,7 +766,7 @@ class TMSConfig(tk.Frame):
 
         killkeyboard()
 
-        w=mn.get()
+        # w=mn.get()
         x=rr.get()
         y=dd.get()
         z=ss.get()
@@ -792,26 +792,24 @@ class TMSConfig(tk.Frame):
         	errorBox("Invalid Division Name")
         elif flag == 3:
         	errorBox("Invalid Station Name")
-        elif not w:
-        	errorBox("Please Enter Model Number")
         else:
             global returnToMenu
             # print returnToMenu
             infoBox("Done")
-            mmm = z
+            # mmm = z
             if returnToMenu==True:
                 controller.show_frame(Menu)
             else:
             	# buttons.config(padx=BUTTONFRAMEPADX)
             	backButton = tk.Button(self.buttons, text = "Back", command = lambda : self.backPressed(controller),image=controller.back,compound="left",font=controller.buttonFont)
-            	nextButton = tk.Button(self.buttons, text = "Save", command = lambda : self.local_show_frame(controller,rr,dd,ss,mn,self.buttons),image=controller.save,compound="left",font=controller.buttonFont)
+            	nextButton = tk.Button(self.buttons, text = "Save", command = lambda : self.local_show_frame(controller,rr,dd,ss,self.buttons),image=controller.save,compound="left",font=controller.buttonFont)
             	backButton.grid(row=0,column=0)
             	nextButton.grid(row=0,column=1,padx=10)
             	controller.show_frame(DateTimeSetting)
 
     def backPressed(self,controller):
 
-    	global sss,rrr,ddd,mmm
+    	global sss,rrr,ddd#,mmm
 
     	os.system("killall matchbox-keyboard")
     	self.entry.grid_forget()
@@ -824,7 +822,7 @@ class TMSConfig(tk.Frame):
     	self.w.set(rrr)
     	self.x.set(ddd)
     	self.y.set(sss)
-    	self.z.set(mmm)
+    	# self.z.set(mmm)
 
     	controller.show_frame(Menu)
 
@@ -865,6 +863,7 @@ class DateTimeSetting(tk.Frame):
         self.grid_columnconfigure(2,weight=1,minsize = MINSIZECOLUMN)
         self.grid_rowconfigure(2,weight=3,minsize = MINSIZEROW2)
         self.grid_rowconfigure(3,weight=1,minsize = MINSIZEROW3)
+        self.x=True
 
         title = tk.Label(self, text="Date and Time Settings", font = controller.headerFont)
         title.grid(pady=10,padx=10,columnspan = 3, sticky="w")
@@ -885,20 +884,20 @@ class DateTimeSetting(tk.Frame):
         label3 = tk.Label(entry, text = "START DATE :",font=controller.defaultFont)
         label4 = tk.Label(entry, text = "START TIME :",font=controller.defaultFont)
 
-        currentDate = tk.StringVar(entry)
-        currentDate.set("1-1-2017")
-        entry1 = tk.Entry(entry,font=controller.defaultFont,textvariable = currentDate)
+        self.currentDate = tk.StringVar(entry)
+        # currentDate.set("1-1-2017")
+        entry1 = tk.Entry(entry,font=controller.defaultFont,textvariable = self.currentDate)
 
         time1 = tk.Frame(entry)
 
-        hh1 = tk.StringVar(time1)
-        hh1.set(HHLIST[0])
-        HH1 = tk.Entry(time1, textvariable = hh1,width=9,font=controller.defaultFont)
+        self.currentHour = tk.StringVar(time1)
+        self.currentHour.set(HHLIST[0])
+        HH1 = tk.Entry(time1, textvariable = self.currentHour,width=9,font=controller.defaultFont)
         HH1.grid(row=0,column=0,padx=3)
         
-        mm1 = tk.StringVar(time1)
-        mm1.set(MMLIST[0])
-        MM1 = tk.Entry(time1, textvariable = mm1,width=9,font=controller.defaultFont)
+        self.currentMinute = tk.StringVar(time1)
+        self.currentMinute.set(MMLIST[0])
+        MM1 = tk.Entry(time1, textvariable = self.currentMinute,width=9,font=controller.defaultFont)
         MM1.grid(row=0,column = 1,padx=3)
                 
         time2 = tk.Frame(entry)
@@ -934,6 +933,8 @@ class DateTimeSetting(tk.Frame):
         nextButton.grid(row = 0,column = 1)
         # date1.grid(row=0,column=2,sticky="w")
         date2.grid(row=2,column=2,sticky="w")
+        self.upDate()
+
 
     def local_show_frame(self,controller,f):
 
@@ -945,6 +946,18 @@ class DateTimeSetting(tk.Frame):
 			calframe.place_forget()
 		controller.show_frame(f)
 
+    def upDate(self):
+
+        if self.x :
+            # global app
+            a=str(datetime.datetime.now())
+            self.currentDate.set(a[8:10]+"-"+a[5:7]+"-"+a[:4])
+            self.currentHour.set(a[11:13])
+            self.currentMinute.set(a[14:16])
+            self.after(1000,self.upDate)
+        else :
+            pass
+
     def start_recording(self,controller,hh1,mm1,hh2,mm2,cdate,sdate):
 
         global c,d,f
@@ -955,6 +968,8 @@ class DateTimeSetting(tk.Frame):
 
         if calframe :
             calframe.place_forget()
+
+        self.x = False
 
     	a = hh1.get()
     	b = mm1.get()
@@ -1042,7 +1057,7 @@ class MainScreen(tk.Frame):
         global date,times,rrrr,ssss,div,t1,t2,t3
 
         date = tk.Label(grid1, text = "DD/MM/YYYY",font = controller.defaultFont)
-        times = tk.Label(grid1, text = "HH/MM",font = controller.defaultFont)
+        times = tk.Label(grid1, text = "HH:MM:SS",font = controller.defaultFont)
         rrrr = tk.Label(grid1, text = "RRRR",font = controller.defaultFont)
         div = tk.Label(grid1, text = "DIV",font = controller.defaultFont)
         ssss = tk.Label(grid1, text = "SSSS",font = controller.defaultFont)
@@ -1412,9 +1427,9 @@ class Output(tk.Frame):
                     calframe.place_forget()
                 global rrr,sss,ddd, outfile,out
                 output_on_screen(rrr,ddd,sss,g,e,f,axx,c,b,d)
-                # num_lines = sum(1 for line in open(HOMEDIR+'/data/output.dat'))
+                # num_lines = sum(1 for line in open('/home/pi/Desktop/output.dat'))
                 # out.config(height=num_lines+100)
-                # file = open(HOMEDIR+'/data/output.dat','r')
+                # file = open('/home/pi/Desktop/output.dat','r')
                 # file.close()
                 controller.read_file_helper()
                 controller.it = -1
@@ -1471,7 +1486,7 @@ class ViewOutput(tk.Frame):
         frame.rowconfigure(1, weight=1)
         frame.columnconfigure(1, weight=1)
         
-        # num_lines = sum(1 for line in open(HOMEDIR+'/data/output.dat'))
+        # num_lines = sum(1 for line in open('/home/pi/Desktop/output.dat'))
         # print num_lines
         global out
         out = tk.Text(frame, state="normal",width = 90,height = 25)
