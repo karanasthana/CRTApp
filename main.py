@@ -105,29 +105,29 @@ def get_calendar(locale, fwday):
 
 def update_maxmin(temp):
 
-    global secondGap,mx,mn,prev_date,MAXIMUM,MINIMUM,maxminsiren1,maxminsiren2
+    global secondGap,currentMaxTempValue,currentMinTempValue,prev_date,MAXIMUM,MINIMUM,maxminsiren1,maxminsiren2
     current_time=str(datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
     date=str(prev_date)
     dd1=str(current_time[:2])
     dd2=str(date[:2])
     #print MAXIMUM,MINIMUM
     if dd1 == dd2:
-        mx=float(mx)
-        mn=float(mn)
-        #print mn,mx
+        currentMaxTempValue=float(currentMaxTempValue)
+        currentMinTempValue=float(currentMinTempValue)
+        #print currentMinTempValue,currentMaxTempValue
         #print "           "
         temp = float(temp)
         #print temp
         MAXIMUM=float(MAXIMUM)
         MINIMUM=float(MINIMUM)
-        if temp>mx:
+        if temp>currentMaxTempValue:
             print MAXIMUM
             if temp<MAXIMUM:
                 if temp!=85.0:
-                    mx=temp
+                    currentMaxTempValue=temp
             elif temp>=MAXIMUM:
                 if temp!=85.0:
-                    mx=temp
+                    currentMaxTempValue=temp
                     #print "ANDAR AA GAYA"
                 
                 if maxminsiren1==0:
@@ -144,12 +144,12 @@ def update_maxmin(temp):
                     buzzer.alarmstop()
                     maxminsiren1=maxminsiren1+1
                         
-                #mx=aaa
-        if temp<mn:
+                #currentMaxTempValue=aaa
+        if temp<currentMinTempValue:
             if temp>=MINIMUM:
-                mn=temp
+                currentMinTempValue=temp
             elif temp<MINIMUM:
-                mn=temp
+                currentMinTempValue=temp
                 if maxminsiren2==0:
                     buzzer.alarmstart()
                     errorBox("MINIMUM TEMPERATURE LIMIT")
@@ -162,24 +162,38 @@ def update_maxmin(temp):
                 buzzer.alarmstop()
                 maxminsiren2=maxminsiren2+1
     else:
-        mx=temp
-        mn=temp
+        currentMaxTempValue=temp
+        currentMinTempValue=temp
                  
-    return (mx,mn)
+    return (currentMaxTempValue,currentMinTempValue)
 
 def recorder(num = 1):
 
     """ this is a recursive module which uses "after" to update the mainscreen 
     per second with current date time and max min and current temperature"""
 
-    global app
-    global t1,t2,t3,date,times,rrr,sss,ddd,rrrr,ssss,div,mx,mn,prev_date
+    global app  # CRTApp class instance
+    global currentTemp   # Label : Current Temperature
+    global currentMaxTemp   # Label : Current maximum temperature
+    global currentMinTemp   # Label : Current minimum temperature
+    global systemDate   # Date Label on Main Screen
+    global systemTime   # Time Label on Main Screen
+    global rrrr     # Label : Railway Name
+    global ssss     # Label : Station Name
+    global dddd     # Label : Division
+    global rrr  # Value : Railway Name
+    global sss  # Value : Station Name
+    global ddd  # Value : Division
+    global currentMaxTempValue  # Value : Current Maximum Temperaature
+    global currentMinTempValue  # Value : Current Minimum Temperaature
+    global prev_date
+
     if num is 1:
         rrrr.configure(text=rrr)
         ssss.configure(text=sss)
-        div.configure(text=ddd)
-        mx=-5
-        mn=85
+        dddd.configure(text=ddd)
+        currentMaxTempValue=-5
+        currentMinTempValue=85
         prev_date=""
     if num:
         
@@ -191,12 +205,21 @@ def recorder(num = 1):
             #errorBox("LOW BATTERY")
             #buzzer.alarmstop()
         tt,check_connection2=temperature.read_temp()
-        global secondGap,maxminsiren1,maxminsiren2
+
+        global secondGap # difference in system time and current time in seconds
+        global maxminsiren1
+        global maxminsiren2
+        global c
+        global d
+        global f
+        global statusLabel
+        global nn
+
         today = (datetime.datetime.now()+datetime.timedelta(seconds=secondGap))
         today1=str(today)
         todaytime = str(today1[11:19])
         today1= str(today1[:10])
-        # global mx,mn,nn
+        # global currentMaxTempValue,currentMinTempValue,nn
         prev_date=today1[8:10]+"/"+today1[5:7]+"/"+today1[:4]
         prev_time=todaytime
         if float(tt)<MAXIMUM:
@@ -206,23 +229,22 @@ def recorder(num = 1):
             if maxminsiren2>0:
                 maxminsiren2=0
         if float(tt)==85.0:
-            t1.configure(text = "--")
+            currentTemp.configure(text = "--")
             buzzer.alarmstart()
             errorBox("Check the connection")
             buzzer.alarmstop()
         elif check_connection2=="00":
-            t1.configure(text = "--")
+            currentTemp.configure(text = "--")
             buzzer.alarmstart()
             errorBox("Check the connection")
             buzzer.alarmstop()    
         else:
-            t1.configure(text = tt)
-            mx,mn=update_maxmin(tt)
-            t2.configure(text = mx)
-            t3.configure(text = mn)
-        date.configure(text = prev_date)
-        times.configure(text=prev_time)
-        global c,d,f,labelr,nn
+            currentTemp.configure(text = tt)
+            currentMaxTempValue,currentMinTempValue=update_maxmin(tt)
+            currentMaxTemp.configure(text = currentMaxTempValue)
+            currentMinTemp.configure(text = currentMinTempValue)
+        systemDate.configure(text = prev_date)
+        systemTime.configure(text=prev_time)
         curr = str(f+" "+c+":"+d+":00")
         starttime=datetime.datetime.strptime(curr,"%d-%m-%Y %H:%M:%S")
         if today>=starttime:
@@ -242,9 +264,9 @@ def recorder(num = 1):
         if nn==1:
             nn=2
             print "done"
-            labelr.configure(text="RECORDING")
-            labelr.configure(fg="red")
-            labelr.configure(image=app.rec)
+            statusLabel.configure(text="RECORDING")
+            statusLabel.configure(fg="red")
+            statusLabel.configure(image=app.rec)
             #toaudio(tt,prev_date,prev_time,rrr,ddd,sss,num)
 
         execend = time.time()*1000
@@ -437,8 +459,8 @@ def output_on_screen(r,d,s,interval,dx,d2,hh12,hh2,mm1,mm2):
 
 
 class AutoScrollbar(tk.Scrollbar):
-    # A scrollbar that hides itself if it's not needed.
-    # Only works if you use the grid geometry manager!
+    """A scrollbar that hides itself if it's not needed.
+    Only works if you use the grid geometry manager!"""
     def set(self, lo, hi):
         if float(lo) <= 0.0 and float(hi) >= 1.0:
             # grid_remove is currently missing from Tkinter!
@@ -458,6 +480,8 @@ class MyDialog(dialog.Dialog):
     Dialog class imported from dialog"""
 
     def body(self, master):
+
+        """body of the dialog box"""
 
         defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
         buttonFont = tkFont.Font(family = "Helvetica", size = 10, weight = "bold")
@@ -479,6 +503,10 @@ class MyDialog(dialog.Dialog):
         return self.entry
 
     def apply(self):
+
+        """over ridden function defines what actions to take 
+        when apply is clicked"""
+
         self.result = int(self.entry.get())
         second = self.ti.get()
         global rrr,sss,ddd
@@ -487,6 +515,9 @@ class MyDialog(dialog.Dialog):
         tkMessageBox.showinfo("Done","Exporting Done")
 
     def validate(self):
+
+        """over ridden function that validates the input from the
+        dialog box"""
 
     	first = self.entry.get()
     	m = re.search("^\d+$",first)
@@ -559,7 +590,7 @@ class CRTApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        time.sleep(1)
+        time.sleep(2)
         self.logo.place_forget()
         self.show_frame(Login)
 
@@ -1051,25 +1082,25 @@ class MainScreen(tk.Frame):
         grid1.grid_columnconfigure(1,weight=1,minsize = 250)
         grid1.grid_columnconfigure(2,weight=1,minsize = 250)
 
-        global date,times,rrrr,ssss,div,t1,t2,t3
+        global systemDate,systemTime,rrrr,ssss,dddd,currentTemp,currentMaxTemp,currentMinTemp
 
-        date = tk.Label(grid1, text = "DD/MM/YYYY",font = controller.defaultFont)
-        times = tk.Label(grid1, text = "HH:MM:SS",font = controller.defaultFont)
+        systemDate = tk.Label(grid1, text = "DD/MM/YYYY",font = controller.defaultFont)
+        systemTime = tk.Label(grid1, text = "HH:MM:SS",font = controller.defaultFont)
         rrrr = tk.Label(grid1, text = "RRRR",font = controller.defaultFont)
-        div = tk.Label(grid1, text = "DIV",font = controller.defaultFont)
+        dddd = tk.Label(grid1, text = "DIV",font = controller.defaultFont)
         ssss = tk.Label(grid1, text = "SSSS",font = controller.defaultFont)
 
-        date.grid(row=0, column = 0,pady=10)
-        times.grid(row=0,column = 2,pady=10)
+        systemDate.grid(row=0, column = 0,pady=10)
+        systemTime.grid(row=0,column = 2,pady=10)
         rrrr.grid(row=1, column = 0,pady=10)
-        div.grid(row=1, column = 1,pady=10)
+        dddd.grid(row=1, column = 1,pady=10)
         ssss.grid(row=1, column = 2,pady=10)
 
-        global labelr
+        global statusLabel
         recording = tk.Frame(display)
         # photo = tk.PhotoImage(file = "/home/anupam/WorkSpace/CRTApp/img/rec.gif")
-        labelr = tk.Label(recording,text="NOT RECORDING",font = controller.defaultFont,fg="blue",image=controller.nrec,compound="left")
-        labelr.pack()
+        statusLabel = tk.Label(recording,text="NOT RECORDING",font = controller.defaultFont,fg="blue",image=controller.nrec,compound="left")
+        statusLabel.pack()
         recording.pack()
 
         grid2 = tk.Frame(display)
@@ -1079,9 +1110,9 @@ class MainScreen(tk.Frame):
         mxtemp = tk.Label(grid2, text = "MAX TEMPERATURE :",font = controller.headerFont)
         mntemp = tk.Label(grid2, text = "MIN TEMPERATURE :",font = controller.headerFont)
 
-        t1 = tk.Label(grid2, text = 0,font = controller.headerFont)
-        t2 = tk.Label(grid2, text = 0,font = controller.headerFont)
-        t3 = tk.Label(grid2, text = 0,font = controller.headerFont)
+        currentTemp = tk.Label(grid2, text = 0,font = controller.headerFont)
+        currentMaxTemp = tk.Label(grid2, text = 0,font = controller.headerFont)
+        currentMinTemp = tk.Label(grid2, text = 0,font = controller.headerFont)
         degree1 = tk.Label(grid2, text = "*C",font = controller.headerFont)
         degree2 = tk.Label(grid2, text = "*C",font = controller.headerFont)
         degree3 = tk.Label(grid2, text = "*C",font = controller.headerFont)
@@ -1089,9 +1120,9 @@ class MainScreen(tk.Frame):
         temp.grid(row=0,column=0,sticky="e",pady=10)
         mxtemp.grid(row=1,column=0,sticky="e",pady=10)
         mntemp.grid(row=2,column=0,sticky="e",pady=10)
-        t1.grid(row=0,column=1)
-        t2.grid(row=1,column=1)
-        t3.grid(row=2,column=1)
+        currentTemp.grid(row=0,column=1)
+        currentMaxTemp.grid(row=1,column=1)
+        currentMinTemp.grid(row=2,column=1)
         degree1.grid(row=0,column=2)
         degree2.grid(row=1,column=2)
         degree3.grid(row=2,column=2)
