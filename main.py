@@ -228,12 +228,12 @@ def recorder(num = 1):
         if float(tt)>MINIMUM:
             if maxminsiren2>0:
                 maxminsiren2=0
-        if float(tt)==85.0:
+        if float(tt)==85.0 and check_connection2=="00":
             currentTemp.configure(text = "--")
             buzzer.alarmstart()
             errorBox("Check the connection")
             buzzer.alarmstop()
-        elif check_connection2=="00":
+        elif check_connection2=="00" and float(tt)==00.0:
             currentTemp.configure(text = "--")
             buzzer.alarmstart()
             errorBox("Check the connection")
