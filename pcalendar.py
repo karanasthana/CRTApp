@@ -9,11 +9,13 @@ try:
     import tkFont
     import ttk
 except ImportError: # py3k
-    import tkinter as Tkinter
+    import tkinter as tk
     import tkinter.font as tkFont
     import tkinter.ttk as ttk
 # import tkFont
 # import Tkinter
+
+# defaultFont = tkFont.Font(family = "Helvetica", size = 12, weight = "bold")
 
 def get_calendar(locale, fwday):
     # instantiate proper calendar class
@@ -90,6 +92,10 @@ class Calendar(ttk.Frame):
     def __setup_styles(self):
         # custom ttk styles
         style = ttk.Style(self.master)
+        # style2 = ttk.Style(self.master)
+        # style.configure('Calendar.Treeview',rowheight=30)
+        # print style.element_names()
+        # print style.layout('Calendar.Treeview')
         arrow_layout = lambda dir: (
             [('Button.focus', {'children': [('Button.%sarrow' % dir, None)]})]
         )
@@ -101,34 +107,39 @@ class Calendar(ttk.Frame):
         hframe = ttk.Frame(self)
         lbtn = ttk.Button(hframe, style='L.TButton', command=self._prev_month)
         rbtn = ttk.Button(hframe, style='R.TButton', command=self._next_month)
-        self._header = ttk.Label(hframe, width=15, anchor='center')
+        defaultFont = tkFont.Font(family = "Helvetica", size = 14, weight = "bold")
+        self._header = ttk.Label(hframe, width=15, anchor='center',font=defaultFont)
         # the calendar
         self._calendar = ttk.Treeview(show='', selectmode='none', height=7)
 
         # pack the widgets
+        hframe.grid_columnconfigure(0,minsize=30)
+        hframe.grid_columnconfigure(2,minsize=30)
         hframe.pack(in_=self, side='top', pady=4, anchor='center')
-        lbtn.grid(in_=hframe)
+        lbtn.grid(in_=hframe,sticky="nsew",padx=5)
         self._header.grid(in_=hframe, column=1, row=0, padx=12)
-        rbtn.grid(in_=hframe, column=2, row=0)
+        rbtn.grid(in_=hframe, column=2, row=0,sticky="nsew",padx=5)
         self._calendar.pack(in_=self, expand=1, fill='both', side='bottom')
 
     def __config_calendar(self):
         cols = self._cal.formatweekheader(3).split()
         self._calendar['columns'] = cols
-        self._calendar.tag_configure('header', background='grey90')
+        font = tkFont.Font(family="Helvetica",size=14,weight="bold")
+        font1 = tkFont.Font(family="Helvetica",size=10,weight="bold")
+        self._calendar.tag_configure('header', background='grey90',font=font1)
         self._calendar.insert('', 'end', values=cols, tag='header')
+
         # adjust its columns width
-        font = tkFont.Font()
         maxwidth = max(font.measure(col) for col in cols)
         for col in cols:
             self._calendar.column(col, width=maxwidth, minwidth=maxwidth,
                 anchor='e')
 
     def __setup_selection(self, sel_bg, sel_fg,updateFunc,calframe,entryBox):
-        self._font = tkFont.Font()
+        self._font = tkFont.Font(family="Helvetica",size=14,weight="bold")
         self._canvas = canvas = Tkinter.Canvas(self._calendar,
             background=sel_bg, borderwidth=0, highlightthickness=0)
-        canvas.text = canvas.create_text(0, 0, fill=sel_fg, anchor='w')
+        canvas.text = canvas.create_text(0, 0, fill=sel_fg, anchor='w',font=self._font)
 
         canvas.bind('<ButtonPress-1>', lambda evt: canvas.place_forget())
         self._calendar.bind('<Configure>', lambda evt: canvas.place_forget())
@@ -147,11 +158,16 @@ class Calendar(ttk.Frame):
         self._header['text'] = header.title()
 
         # update calendar shown dates
+        font = tkFont.Font(family="Helvetica",size=14)
         cal = self._cal.monthdayscalendar(year, month)
         for indx, item in enumerate(self._items):
             week = cal[indx] if indx < len(cal) else []
             fmt_week = [('%02d' % day) if day else '' for day in week]
-            self._calendar.item(item, values=fmt_week)
+            # print fmt_week
+            self._calendar.item(item, values=fmt_week,tag='date')
+
+            self._calendar.tag_configure('date',font=font)
+            # print x
 
     def _show_selection(self, text, bbox):
         """Configure canvas for a new selection."""
@@ -241,7 +257,8 @@ def test():
 
     if 'win' not in sys.platform:
         style = ttk.Style()
-        style.theme_use('clam')
+        style.configure('Treeview',rowheight=40)
+        # style.theme_use('clam')
 
     
 

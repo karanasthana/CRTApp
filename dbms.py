@@ -9,11 +9,11 @@ cursor = db.cursor()
 def todbms(tt,date,time1,num):
     #if num%1==0 :
     if num%60==1 :
-        today = str(date)
-        yy=str(today[:4])
-        mm=str(today[5:7])
-        dd=str(today[8:10])
-        stringdatetime = dd+"/"+mm+"/"+yy+" "+str(time1[:5])+":00"
+        # today = str(date)
+        # yy=str(today[:4])
+        # mm=str(today[5:7])
+        # dd=str(today[8:10])
+        stringdatetime = str(date[:10])+" "+str(time1[:5])+":00"
         #stringtime = str(time[:5])
         epochtime = int(time.mktime(time.strptime(stringdatetime,"%d/%m/%Y %H:%M:%S")))        
         epochtime=str(epochtime)
